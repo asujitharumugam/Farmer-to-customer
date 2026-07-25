@@ -76,7 +76,7 @@ const CustomerDashboard = () => {
         <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center justify-between">
           <div>
             <p className="text-xs font-extrabold uppercase text-slate-400">Total Spent</p>
-            <h3 className="text-2xl font-extrabold text-slate-900 mt-1">${stats?.totalSpent?.toFixed(2) || '0.00'}</h3>
+            <h3 className="text-2xl font-extrabold text-slate-900 mt-1">₹{stats?.totalSpent?.toFixed(2) || '0.00'}</h3>
           </div>
           <div className="w-12 h-12 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center font-bold">
             <CheckCircle2 className="w-6 h-6" />
@@ -111,7 +111,7 @@ const CustomerDashboard = () => {
               <div key={ord._id} className="p-4 bg-slate-50 rounded-2xl border border-slate-200/70 space-y-3">
                 <div className="flex justify-between items-center text-xs font-bold">
                   <span className="text-brand-700">{ord.orderNumber}</span>
-                  <span className="text-slate-900">${ord.totalAmount?.toFixed(2)}</span>
+                  <span className="text-slate-900">₹{ord.totalAmount?.toFixed(2)}</span>
                 </div>
                 <OrderTimeline status={ord.orderStatus} />
               </div>

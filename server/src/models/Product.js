@@ -31,7 +31,7 @@ const productSchema = new mongoose.Schema({
   },
   unit: {
     type: String,
-    enum: ['kg', 'gram', 'piece', 'dozen', 'box'],
+    enum: ['kg', 'gram', 'piece', 'dozen', 'box', 'litre'],
     default: 'kg'
   },
   stockQuantity: {

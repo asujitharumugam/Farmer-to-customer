@@ -134,7 +134,7 @@ const ProduceDetails = () => {
 
             <div className="flex items-baseline gap-2">
               <span className="text-3xl font-extrabold text-slate-900">
-                ${product.pricePerUnit?.toFixed(2)}
+                ₹{product.pricePerUnit?.toFixed(2)}
               </span>
               <span className="text-sm font-semibold text-slate-500">per {product.unit}</span>
             </div>
@@ -193,7 +193,7 @@ const ProduceDetails = () => {
               disabled={product.stockQuantity <= 0}
               className="w-full flex items-center justify-center gap-2 py-4 px-6 bg-brand-600 hover:bg-brand-700 disabled:bg-slate-300 text-white font-bold text-sm rounded-2xl shadow-xl shadow-brand-600/30 transition-all hover:scale-[1.01]"
             >
-              <ShoppingBag className="w-5 h-5" /> Add to Produce Cart - ${(product.pricePerUnit * quantity).toFixed(2)}
+              <ShoppingBag className="w-5 h-5" /> Add to Produce Cart - ₹{(product.pricePerUnit * quantity).toFixed(2)}
             </button>
           </div>
 

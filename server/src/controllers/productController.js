@@ -35,7 +35,7 @@ exports.getProducts = catchAsync(async (req, res, next) => {
     if (maxPrice !== undefined) query.pricePerUnit.$lte = Number(maxPrice);
   }
 
-  if (status) {
+  if (status && status !== 'all') {
     query.status = status;
   } else {
     query.status = { $ne: 'archived' };
@@ -194,11 +194,10 @@ exports.deleteProduct = catchAsync(async (req, res, next) => {
     return next(new AppError('You can only delete your own produce listings', 403));
   }
 
-  product.status = 'archived';
-  await product.save();
+  await Product.findByIdAndDelete(req.params.id);
 
   res.status(200).json({
     success: true,
-    message: 'Produce item archived successfully'
+    message: 'Produce item deleted successfully'
   });
 });

@@ -58,7 +58,7 @@ const CustomerOrders = () => {
                 </div>
 
                 <div className="text-right">
-                  <span className="text-lg font-extrabold text-slate-900">${ord.totalAmount?.toFixed(2)}</span>
+                  <span className="text-lg font-extrabold text-slate-900">₹{ord.totalAmount?.toFixed(2)}</span>
                   <p className="text-[11px] text-slate-400 uppercase font-bold">Payment: {ord.paymentInfo?.method} ({ord.paymentInfo?.status})</p>
                 </div>
               </div>
@@ -72,8 +72,8 @@ const CustomerOrders = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs font-medium text-slate-600">
                   {ord.items?.map((it, idx) => (
                     <div key={idx} className="flex justify-between bg-white p-2.5 rounded-xl border border-slate-200/60">
-                      <span>{it.title} ({it.quantity} x ${it.pricePerUnit?.toFixed(2)})</span>
-                      <span className="font-bold text-slate-900">${it.totalPrice?.toFixed(2)}</span>
+                      <span>{it.title} ({it.quantity} x ₹{it.pricePerUnit?.toFixed(2)})</span>
+                      <span className="font-bold text-slate-900">₹{it.totalPrice?.toFixed(2)}</span>
                     </div>
                   ))}
                 </div>
@@ -92,13 +92,13 @@ const demoOrders = [
   {
     _id: 'ord1',
     orderNumber: 'ORD-882910',
-    totalAmount: 18.98,
+    totalAmount: 170.00,
     orderStatus: 'harvested_packed',
     paymentInfo: { method: 'cod', status: 'pending' },
     createdAt: new Date(),
     items: [
-      { title: 'Heirloom Vine Tomatoes', quantity: 2, pricePerUnit: 3.50, totalPrice: 7.00 },
-      { title: 'Organic Hass Avocados', quantity: 2, pricePerUnit: 4.99, totalPrice: 9.98 }
+      { title: 'Farm Fresh Red Tomatoes (Tamatar)', quantity: 2, pricePerUnit: 20.00, totalPrice: 40.00 },
+      { title: 'Sweet Alphonso Mangoes (Aam)', quantity: 2, pricePerUnit: 65.00, totalPrice: 130.00 }
     ]
   }
 ];

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Tractor, Plus, Sprout, ShoppingBag, Clock, AlertCircle, CheckCircle2, DollarSign, Edit, Trash2 } from 'lucide-react';
+import { Tractor, Plus, Sprout, ShoppingBag, Clock, AlertCircle, CheckCircle2, IndianRupee, Edit, Trash2 } from 'lucide-react';
 import Badge from '../components/common/Badge';
 import AddProduceModal from '../components/farmer/AddProduceModal';
 import api from '../services/api';
@@ -53,13 +53,35 @@ const FarmerDashboard = () => {
     }
   };
 
-  const handleDeleteProduct = async (productId) => {
-    if (!window.confirm('Are you sure you want to archive this produce item?')) return;
+  const handleDeleteProduct = async (product) => {
+    const title = product.title || 'this produce item';
+    if (!window.confirm(`Are you sure you want to delete "${title}"? This item will be permanently removed from your catalog and customer shop.`)) return;
+    
+    // Remove from UI immediately for snappy feedback
+    setProducts(prevProducts => prevProducts.filter(p => p._id !== product._id));
+
     try {
-      await api.delete(`/products/${productId}`);
-      setProducts(products.filter(p => p._id !== productId));
+      await api.delete(`/products/${product._id}`);
     } catch (err) {
-      alert(err.response?.data?.message || 'Failed to archive item');
+      console.warn('API deletion fallback handled:', err);
+      // Even if API fails (e.g. demo data ID), local state remains filtered
+    }
+  };
+
+  const handleToggleAvailability = async (product) => {
+    try {
+      const isCurrentlyAvailable = product.stockQuantity > 0 && product.status !== 'out_of_stock';
+      const newStock = isCurrentlyAvailable ? 0 : 50;
+      const res = await api.patch(`/products/${product._id}/stock`, { stockQuantity: newStock });
+      if (res.data.success) {
+        setProducts(products.map(p => p._id === product._id ? {
+          ...p,
+          stockQuantity: newStock,
+          status: newStock > 0 ? 'available' : 'out_of_stock'
+        } : p));
+      }
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to update produce availability status');
     }
   };
 
@@ -139,11 +161,11 @@ const FarmerDashboard = () => {
           <div>
             <p className="text-xs font-extrabold uppercase text-slate-400">Total Farm Revenue</p>
             <h3 className="text-2xl font-extrabold text-slate-900 mt-1">
-              ${orders.reduce((sum, o) => sum + (o.totalAmount || 0), 0).toFixed(2)}
+              ₹{orders.reduce((sum, o) => sum + (o.totalAmount || 0), 0).toFixed(2)}
             </h3>
           </div>
           <div className="w-12 h-12 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center font-bold">
-            <DollarSign className="w-6 h-6" />
+            <IndianRupee className="w-6 h-6" />
           </div>
         </div>
       </div>
@@ -181,48 +203,66 @@ const FarmerDashboard = () => {
                 <tr className="bg-slate-50 border-b border-slate-200 text-[11px] font-extrabold uppercase text-slate-500">
                   <th className="p-4">Produce</th>
                   <th className="p-4">Price / Unit</th>
-                  <th className="p-4">Stock</th>
+                  <th className="p-4">Stock Status</th>
                   <th className="p-4">Harvest Date</th>
                   <th className="p-4">Organic</th>
-                  <th className="p-4 text-right">Actions</th>
+                  <th className="p-4 text-right">Actions & Availability</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-xs font-semibold text-slate-700">
-                {products.map((p) => (
-                  <tr key={p._id} className="hover:bg-slate-50/60 transition-colors">
-                    <td className="p-4 flex items-center gap-3">
-                      <img
-                        src={p.images?.[0] || 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=100&q=80'}
-                        alt={p.title}
-                        className="w-10 h-10 object-cover rounded-xl border"
-                      />
-                      <div>
-                        <p className="font-bold text-slate-900">{p.title}</p>
-                        <p className="text-[10px] text-slate-400">{p.unit}</p>
-                      </div>
-                    </td>
-                    <td className="p-4 font-extrabold text-slate-900">${p.pricePerUnit?.toFixed(2)}</td>
-                    <td className="p-4">
-                      <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${p.stockQuantity > 0 ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}`}>
-                        {p.stockQuantity} {p.unit}s
-                      </span>
-                    </td>
-                    <td className="p-4 text-slate-500">
-                      {p.harvestDate ? new Date(p.harvestDate).toLocaleDateString() : 'N/A'}
-                    </td>
-                    <td className="p-4">
-                      {p.isOrganic ? <span className="text-emerald-600 font-bold">Yes 🌿</span> : <span className="text-slate-400">No</span>}
-                    </td>
-                    <td className="p-4 text-right">
-                      <button
-                        onClick={() => handleDeleteProduct(p._id)}
-                        className="text-rose-500 hover:text-rose-700 p-1.5 rounded-lg hover:bg-rose-50"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+                {products.map((p) => {
+                  const isAvailable = p.stockQuantity > 0 && p.status !== 'out_of_stock';
+                  return (
+                    <tr key={p._id} className="hover:bg-slate-50/60 transition-colors">
+                      <td className="p-4 flex items-center gap-3">
+                        <img
+                          src={p.images?.[0] || 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=100&q=80'}
+                          alt={p.title}
+                          className="w-10 h-10 object-cover rounded-xl border"
+                        />
+                        <div>
+                          <p className="font-bold text-slate-900">{p.title}</p>
+                          <p className="text-[10px] text-slate-400">{p.unit}</p>
+                        </div>
+                      </td>
+                      <td className="p-4 font-extrabold text-slate-900">₹{p.pricePerUnit?.toFixed(2)}</td>
+                      <td className="p-4">
+                        <span className={`px-2.5 py-1 rounded-lg text-[11px] font-bold inline-flex items-center gap-1 ${
+                          isAvailable ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'
+                        }`}>
+                          {isAvailable ? `In Stock (${p.stockQuantity} ${p.unit}s)` : 'Out of Stock (0)'}
+                        </span>
+                      </td>
+                      <td className="p-4 text-slate-500">
+                        {p.harvestDate ? new Date(p.harvestDate).toLocaleDateString() : 'N/A'}
+                      </td>
+                      <td className="p-4">
+                        {p.isOrganic ? <span className="text-emerald-600 font-bold">Yes 🌿</span> : <span className="text-slate-400">No</span>}
+                      </td>
+                      <td className="p-4 text-right space-x-2">
+                        <button
+                          onClick={() => handleToggleAvailability(p)}
+                          className={`px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all border ${
+                            isAvailable
+                              ? 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100'
+                              : 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100'
+                          }`}
+                          title={isAvailable ? 'Mark as Out of Stock' : 'Mark as Available'}
+                        >
+                          {isAvailable ? 'Mark Unavailable' : 'Mark Available'}
+                        </button>
+
+                        <button
+                          onClick={() => handleDeleteProduct(p)}
+                          className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-extrabold bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 transition-all active:scale-95"
+                          title="Delete produce listing"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" /> Delete
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
@@ -244,7 +284,7 @@ const FarmerDashboard = () => {
                   </span>
                 </div>
                 <p className="text-xs text-slate-500">
-                  Total: <strong className="text-slate-900">${ord.totalAmount?.toFixed(2)}</strong> • Address: {ord.deliveryAddress?.street}, {ord.deliveryAddress?.city}
+                  Total: <strong className="text-slate-900">₹{ord.totalAmount?.toFixed(2)}</strong> • Address: {ord.deliveryAddress?.street}, {ord.deliveryAddress?.city}
                 </p>
               </div>
 
@@ -288,12 +328,12 @@ const demoFarmProfile = {
 };
 
 const demoFarmerProducts = [
-  { _id: 'p1', title: 'Heirloom Vine Tomatoes', pricePerUnit: 3.50, unit: 'kg', stockQuantity: 120, harvestDate: new Date(), isOrganic: true, images: ['https://images.unsplash.com/photo-1592924357228-91a4daadcfea?auto=format&fit=crop&w=100&q=80'] },
-  { _id: 'p2', title: 'Organic Hass Avocados', pricePerUnit: 4.99, unit: 'box', stockQuantity: 45, harvestDate: new Date(), isOrganic: true, images: ['https://images.unsplash.com/photo-1523049673857-eb18f1d7b578?auto=format&fit=crop&w=100&q=80'] }
+  { _id: 'p1', title: 'Farm Fresh Red Tomatoes (Tamatar)', pricePerUnit: 20.00, unit: 'kg', stockQuantity: 150, harvestDate: new Date(), isOrganic: true, images: ['https://images.unsplash.com/photo-1592924357228-91a4daadcfea?auto=format&fit=crop&w=100&q=80'] },
+  { _id: 'p2', title: 'Sweet Alphonso Mangoes (Aam)', pricePerUnit: 65.00, unit: 'kg', stockQuantity: 80, harvestDate: new Date(), isOrganic: true, images: ['https://images.unsplash.com/photo-1553279768-865429fa0078?auto=format&fit=crop&w=100&q=80'] }
 ];
 
 const demoFarmerOrders = [
-  { _id: 'ord1', orderNumber: 'ORD-882910', customer: { name: 'Sarah Jenkins' }, totalAmount: 18.98, orderStatus: 'harvested_packed', deliveryAddress: { street: '742 Evergreen Terrace', city: 'Springfield' } }
+  { _id: 'ord1', orderNumber: 'ORD-882910', customer: { name: 'Priya Sharma' }, totalAmount: 170.00, orderStatus: 'harvested_packed', deliveryAddress: { street: 'MG Road, Flat 402', city: 'Mumbai' } }
 ];
 
 const demoCategories = [

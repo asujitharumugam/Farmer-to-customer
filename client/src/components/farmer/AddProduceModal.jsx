@@ -116,18 +116,19 @@ const AddProduceModal = ({ isOpen, onClose, onRefresh, categories }) => {
                 <option value="piece">Per Piece / Item</option>
                 <option value="dozen">Per Dozen</option>
                 <option value="box">Per Farm Box</option>
+                <option value="litre">Per Litre</option>
               </select>
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block mb-1">Price per Unit ($)</label>
+              <label className="block mb-1">Price per Unit (₹)</label>
               <input
                 type="number"
                 step="0.01"
                 required
-                placeholder="3.50"
+                placeholder="40.00"
                 value={formData.pricePerUnit}
                 onChange={e => setFormData({ ...formData, pricePerUnit: e.target.value })}
                 className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-brand-500"

@@ -78,7 +78,7 @@ exports.createStripeIntent = catchAsync(async (req, res, next) => {
     if (process.env.STRIPE_SECRET_KEY && !process.env.STRIPE_SECRET_KEY.includes('mock')) {
       const paymentIntent = await stripe.paymentIntents.create({
         amount: Math.round(amount * 100),
-        currency: 'usd',
+        currency: 'inr',
         payment_method_types: ['card']
       });
 

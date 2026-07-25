@@ -11,11 +11,11 @@ const CartCheckout = () => {
   const navigate = useNavigate();
 
   const [address, setAddress] = useState({
-    street: user?.addresses?.[0]?.street || '742 Evergreen Terrace',
-    city: user?.addresses?.[0]?.city || 'Springfield',
-    state: user?.addresses?.[0]?.state || 'IL',
-    zipCode: user?.addresses?.[0]?.zipCode || '62704',
-    phone: user?.phone || '+1 555 019 3344'
+    street: user?.addresses?.[0]?.street || 'MG Road, Flat 402',
+    city: user?.addresses?.[0]?.city || 'Mumbai',
+    state: user?.addresses?.[0]?.state || 'MH',
+    zipCode: user?.addresses?.[0]?.zipCode || '400001',
+    phone: user?.phone || '+91 98765 12345'
   });
 
   const [deliveryMethod, setDeliveryMethod] = useState('home_delivery');
@@ -24,7 +24,7 @@ const CartCheckout = () => {
   const [submitting, setSubmitting] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState(null);
 
-  const deliveryFee = deliveryMethod === 'home_delivery' ? 4.99 : 0;
+  const deliveryFee = deliveryMethod === 'home_delivery' ? 50 : 0;
   const grandTotal = cartTotal + deliveryFee;
 
   const handlePlaceOrder = async (e) => {
@@ -205,7 +205,7 @@ const CartCheckout = () => {
                 }`}
               >
                 <span className="text-xs font-extrabold text-slate-900">Direct Home Delivery</span>
-                <span className="text-[11px] text-slate-500 font-semibold mt-1">Dispatched fresh from farm ($4.99)</span>
+                <span className="text-[11px] text-slate-500 font-semibold mt-1">Dispatched fresh from farm (₹50)</span>
               </label>
 
               <label
@@ -254,15 +254,15 @@ const CartCheckout = () => {
               >
                 <div className="flex items-center gap-2">
                   <CreditCard className="w-5 h-5 text-purple-600" />
-                  <span className="text-xs font-extrabold text-slate-900">Stripe Card (Optional)</span>
+                  <span className="text-xs font-extrabold text-slate-900">Online Card / UPI</span>
                 </div>
-                <p className="text-[10px] text-slate-400 mt-1">Secure online card payment.</p>
+                <p className="text-[10px] text-slate-400 mt-1">Secure online payment.</p>
               </label>
             </div>
 
             {paymentMethod === 'stripe' && (
               <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2 text-xs font-bold">
-                <label className="block text-slate-700">Card Number (Mock Stripe Integration)</label>
+                <label className="block text-slate-700">Card Number (Mock Payment Integration)</label>
                 <input
                   type="text"
                   value={cardNumber}
@@ -287,10 +287,10 @@ const CartCheckout = () => {
                 <div key={item._id} className="flex justify-between items-center text-xs">
                   <div>
                     <p className="font-bold text-slate-900">{item.title}</p>
-                    <p className="text-slate-400">{item.quantity} x ${item.pricePerUnit?.toFixed(2)} / {item.unit}</p>
+                    <p className="text-slate-400">{item.quantity} x ₹{item.pricePerUnit?.toFixed(2)} / {item.unit}</p>
                   </div>
                   <span className="font-extrabold text-slate-900">
-                    ${(item.pricePerUnit * item.quantity).toFixed(2)}
+                    ₹{(item.pricePerUnit * item.quantity).toFixed(2)}
                   </span>
                 </div>
               ))}
@@ -299,15 +299,15 @@ const CartCheckout = () => {
             <div className="pt-4 border-t border-slate-100 space-y-2 text-xs font-semibold text-slate-600">
               <div className="flex justify-between">
                 <span>Produce Subtotal</span>
-                <span>${cartTotal.toFixed(2)}</span>
+                <span>₹{cartTotal.toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
                 <span>Farm Delivery Fee</span>
-                <span>${deliveryFee.toFixed(2)}</span>
+                <span>₹{deliveryFee.toFixed(2)}</span>
               </div>
               <div className="flex justify-between text-sm font-extrabold text-slate-900 pt-2 border-t border-slate-100">
                 <span>Total Amount Due</span>
-                <span className="text-brand-700 text-lg">${grandTotal.toFixed(2)}</span>
+                <span className="text-brand-700 text-lg">₹{grandTotal.toFixed(2)}</span>
               </div>
             </div>
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ShieldCheck, Users, Tractor, ShoppingBag, DollarSign, Plus, CheckCircle2, XCircle } from 'lucide-react';
+import { ShieldCheck, Users, Tractor, ShoppingBag, IndianRupee, Plus, CheckCircle2, XCircle } from 'lucide-react';
 import StatsCard from '../components/admin/StatsCard';
 import VerificationCard from '../components/admin/VerificationCard';
 import api from '../services/api';
@@ -94,8 +94,8 @@ const AdminDashboard = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatsCard
           title="Gross Merchandise (GMV)"
-          value={`$${stats?.totalGMV?.toFixed(2) || '0.00'}`}
-          icon={DollarSign}
+          value={`₹${stats?.totalGMV?.toFixed(2) || '0.00'}`}
+          icon={IndianRupee}
           color="brand"
           subtext="Total processed volume"
         />

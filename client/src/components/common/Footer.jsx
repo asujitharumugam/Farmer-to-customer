@@ -1,8 +1,17 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Sprout, ShieldCheck, Heart, Truck, MapPin } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const Footer = () => {
+  const [email, setEmail] = useState('');
+  const [subscribed, setSubscribed] = useState(false);
+
+  const handleSubscribe = (e) => {
+    e.preventDefault();
+    if (email.trim()) {
+      setSubscribed(true);
+    }
+  };
   return (
     <footer className="bg-slate-900 text-slate-300 pt-16 pb-12 border-t border-slate-800 font-sans mt-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -79,16 +88,29 @@ const Footer = () => {
           <div>
             <h5 className="text-xs font-extrabold text-white uppercase tracking-wider mb-4">Farm Community</h5>
             <p className="text-xs text-slate-400 mb-3">Subscribe to get weekly harvest alerts & farm stories directly.</p>
-            <form onSubmit={(e) => e.preventDefault()} className="flex gap-2">
-              <input
-                type="email"
-                placeholder="Enter your email"
-                className="bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 w-full"
-              />
-              <button className="bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs px-3 py-2 rounded-xl transition-colors shrink-0">
-                Join
-              </button>
-            </form>
+            {subscribed ? (
+              <div className="bg-emerald-950/80 border border-emerald-500/40 text-emerald-300 p-3 rounded-2xl text-xs font-bold flex items-center gap-2 animate-in fade-in zoom-in-95">
+                <span className="text-emerald-400 font-extrabold text-sm">✓</span>
+                <span>Subscribed! Check your inbox for weekly harvest updates.</span>
+              </div>
+            ) : (
+              <form onSubmit={handleSubscribe} className="flex gap-2">
+                <input
+                  type="email"
+                  required
+                  placeholder="Enter your email address"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="bg-slate-800/80 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 w-full transition-all"
+                />
+                <button
+                  type="submit"
+                  className="bg-gradient-to-r from-brand-600 to-emerald-600 hover:from-brand-700 hover:to-emerald-700 text-white font-extrabold text-xs px-4 py-2 rounded-xl transition-all shadow-md shadow-brand-600/20 active:scale-95 shrink-0"
+                >
+                  Join
+                </button>
+              </form>
+            )}
           </div>
         </div>
 

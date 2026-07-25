@@ -20,21 +20,21 @@ const Navbar = () => {
   };
 
   return (
-    <header className="sticky top-0 z-40 w-full glass-panel border-b border-slate-200/80 shadow-sm transition-all">
+    <header className="sticky top-0 z-40 w-full glass-card border-b border-slate-200/80 shadow-md backdrop-blur-xl transition-all">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           
           {/* Brand Logo */}
           <Link to="/" className="flex items-center gap-3 group">
-            <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-brand-700 via-brand-600 to-emerald-400 flex items-center justify-center text-white shadow-md shadow-brand-600/20 group-hover:scale-105 transition-transform">
-              <Sprout className="w-6 h-6" />
+            <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-emerald-800 via-brand-600 to-amber-400 flex items-center justify-center text-white shadow-lg shadow-brand-600/30 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
+              <Sprout className="w-6 h-6 animate-pulse-glow" />
             </div>
             <div>
-              <span className="text-2xl font-extrabold tracking-tight text-slate-900 font-sans">
-                Farm<span className="text-brand-600">Direct</span>
+              <span className="text-2xl font-black tracking-tight text-slate-900 font-sans">
+                Farm<span className="text-gradient">Direct</span>
               </span>
-              <span className="block text-[10px] uppercase font-bold tracking-widest text-emerald-700 font-sans">
-                Farm-to-Table Marketplace
+              <span className="block text-[9px] uppercase font-black tracking-widest text-emerald-800 font-sans">
+                🌱 Direct Farm Harvest
               </span>
             </div>
           </Link>
@@ -43,7 +43,7 @@ const Navbar = () => {
           <form onSubmit={handleSearchSubmit} className="hidden md:flex flex-1 max-w-md mx-8 relative">
             <input
               type="text"
-              placeholder="Search heirloom tomatoes, avocados, honey..."
+              placeholder="Search tomatoes, mangoes, basmati rice, milk..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full bg-slate-100/80 border border-slate-200 rounded-full py-2.5 pl-11 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all"

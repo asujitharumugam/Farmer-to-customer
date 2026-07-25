@@ -66,7 +66,7 @@ const CartPage = () => {
                     <div>
                       <h4 className="text-sm font-bold text-slate-900">{item.title}</h4>
                       <p className="text-xs text-slate-500 font-semibold mt-0.5">
-                        ${item.pricePerUnit?.toFixed(2)} / {item.unit}
+                        ₹{item.pricePerUnit?.toFixed(2)} / {item.unit}
                       </p>
                     </div>
                   </div>
@@ -89,7 +89,7 @@ const CartPage = () => {
                     </div>
 
                     <span className="text-sm font-extrabold text-slate-900 w-16 text-right">
-                      ${(item.pricePerUnit * item.quantity).toFixed(2)}
+                      ₹{(item.pricePerUnit * item.quantity).toFixed(2)}
                     </span>
 
                     <button
@@ -110,7 +110,7 @@ const CartPage = () => {
               <h3 className="text-base font-bold text-slate-900 border-b border-slate-100 pb-3">Order Summary</h3>
               <div className="flex justify-between items-center text-xs font-semibold text-slate-600">
                 <span>Subtotal</span>
-                <span className="text-base font-extrabold text-slate-900">${cartTotal.toFixed(2)}</span>
+                <span className="text-base font-extrabold text-slate-900">₹{cartTotal.toFixed(2)}</span>
               </div>
               <p className="text-[11px] text-slate-400">Delivery fees calculated at checkout step.</p>
             </div>

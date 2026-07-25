@@ -66,7 +66,7 @@ const CartDrawer = () => {
                     <div>
                       <h4 className="text-xs font-bold text-slate-900 line-clamp-1">{item.title}</h4>
                       <p className="text-xs text-slate-500 font-semibold mt-0.5">
-                        ${item.pricePerUnit?.toFixed(2)} / {item.unit}
+                        ₹{item.pricePerUnit?.toFixed(2)} / {item.unit}
                       </p>
                     </div>
                   </div>
@@ -105,7 +105,7 @@ const CartDrawer = () => {
             <div className="p-6 bg-slate-50 border-t border-slate-200 space-y-4">
               <div className="flex justify-between items-center text-sm font-semibold text-slate-600">
                 <span>Subtotal</span>
-                <span className="font-extrabold text-slate-900 text-lg">${cartTotal.toFixed(2)}</span>
+                <span className="font-extrabold text-slate-900 text-lg">₹{cartTotal.toFixed(2)}</span>
               </div>
               <p className="text-[11px] text-slate-400">Taxes and farm delivery fees calculated at checkout.</p>
 

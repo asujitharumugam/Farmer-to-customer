@@ -155,51 +155,51 @@ const Shop = () => {
 const demoShopProducts = [
   {
     _id: 'p1',
-    title: 'Heirloom Vine Tomatoes',
-    description: 'Naturally ripened on the vine with rich juicy flavor.',
-    pricePerUnit: 3.50,
+    title: 'Farm Fresh Red Tomatoes (Tamatar)',
+    description: 'Naturally ripened fresh juicy red tomatoes harvested daily.',
+    pricePerUnit: 20.00,
     unit: 'kg',
-    stockQuantity: 120,
+    stockQuantity: 150,
     isOrganic: true,
     harvestDate: new Date(Date.now() + 86400000 * 2),
     images: ['https://images.unsplash.com/photo-1592924357228-91a4daadcfea?auto=format&fit=crop&w=800&q=80'],
-    farm: { _id: 'f1', farmName: 'Green Acres Valley' }
+    farm: { _id: 'f1', farmName: 'Green Acres Organic Valley' }
   },
   {
     _id: 'p2',
-    title: 'Organic Hass Avocados',
-    description: 'Creamy, rich avocados hand-picked at peak maturity.',
-    pricePerUnit: 4.99,
-    unit: 'box',
-    stockQuantity: 45,
+    title: 'Sweet Alphonso Mangoes (Aam)',
+    description: 'Naturally tree-ripened organic sweet Alphonso mangoes with rich aroma.',
+    pricePerUnit: 65.00,
+    unit: 'kg',
+    stockQuantity: 80,
     isOrganic: true,
     harvestDate: new Date(Date.now() + 86400000 * 1),
-    images: ['https://images.unsplash.com/photo-1523049673857-eb18f1d7b578?auto=format&fit=crop&w=800&q=80'],
-    farm: { _id: 'f1', farmName: 'Green Acres Valley' }
+    images: ['https://images.unsplash.com/photo-1553279768-865429fa0078?auto=format&fit=crop&w=800&q=80'],
+    farm: { _id: 'f1', farmName: 'Green Acres Organic Valley' }
   },
   {
     _id: 'p3',
-    title: 'Farm Fresh Spinach Bunch',
-    description: 'Crisp green spinach washed in natural spring water.',
-    pricePerUnit: 2.20,
+    title: 'Fresh Organic Palak (Spinach)',
+    description: 'Crisp green spinach washed in natural farm water.',
+    pricePerUnit: 12.00,
     unit: 'piece',
-    stockQuantity: 80,
+    stockQuantity: 100,
     isOrganic: true,
     harvestDate: new Date(),
     images: ['https://images.unsplash.com/photo-1576045057995-568f588f82fb?auto=format&fit=crop&w=800&q=80'],
-    farm: { _id: 'f1', farmName: 'Green Acres Valley' }
+    farm: { _id: 'f1', farmName: 'Green Acres Organic Valley' }
   },
   {
     _id: 'p4',
-    title: 'Wild Mountain Forest Honey',
+    title: 'Wild Forest Raw Honey (Madhu)',
     description: 'Unfiltered raw wildflower honey collected directly from farm apiaries.',
-    pricePerUnit: 8.50,
+    pricePerUnit: 120.00,
     unit: 'piece',
-    stockQuantity: 30,
+    stockQuantity: 40,
     isOrganic: true,
     harvestDate: new Date(Date.now() - 86400000 * 5),
     images: ['https://images.unsplash.com/photo-1587049352846-4a222e784d38?auto=format&fit=crop&w=800&q=80'],
-    farm: { _id: 'f1', farmName: 'Green Acres Valley' }
+    farm: { _id: 'f1', farmName: 'Green Acres Organic Valley' }
   }
 ];
 
