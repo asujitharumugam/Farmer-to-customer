@@ -1,7 +1,8 @@
 import React from 'react';
-import { X, Trash2, Plus, Minus, ArrowRight, ShoppingBag } from 'lucide-react';
+import { X, Trash2, Plus, Minus, ShoppingBag, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
+import { handleImageError } from '../../utils/imageUtils';
 
 const CartDrawer = () => {
   const { cart, isDrawerOpen, setIsDrawerOpen, updateQuantity, removeFromCart, cartTotal } = useCart();
@@ -61,6 +62,7 @@ const CartDrawer = () => {
                     <img
                       src={item.images?.[0] || 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=150&q=80'}
                       alt={item.title}
+                      onError={(e) => handleImageError(e, 'produce')}
                       className="w-14 h-14 object-cover rounded-xl border border-slate-200"
                     />
                     <div>

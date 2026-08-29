@@ -3,6 +3,8 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { ShoppingBag, User, LogOut, Sprout, ShieldCheck, Tractor, Search, Menu, X, ChevronDown, Heart, Settings as SettingsIcon, Info, PhoneCall } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
+import Logo from './Logo';
+import { handleImageError } from '../../utils/imageUtils';
 
 const Navbar = () => {
   const { user, logout, switchRoleDemo } = useAuth();
@@ -25,30 +27,26 @@ const Navbar = () => {
         <div className="flex items-center justify-between h-20">
           
           {/* Brand Logo */}
-          <Link to="/" className="flex items-center gap-3 group">
-            <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-emerald-800 via-brand-600 to-amber-400 flex items-center justify-center text-white shadow-lg shadow-brand-600/30 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
-              <Sprout className="w-6 h-6 animate-pulse-glow" />
-            </div>
-            <div>
-              <span className="text-2xl font-black tracking-tight text-slate-900 font-sans">
-                Farm<span className="text-gradient">Direct</span>
-              </span>
-              <span className="block text-[9px] uppercase font-black tracking-widest text-emerald-800 font-sans">
-                🌱 Direct Farm Harvest
-              </span>
-            </div>
+          <Link to="/">
+            <Logo size="md" />
           </Link>
 
+          {/* Location Delivery Selector Badge */}
+          <div className="hidden xl:flex items-center gap-2 bg-amber-50 border border-amber-200/80 px-3.5 py-1.5 rounded-full text-xs font-black text-amber-900 shrink-0">
+            <span className="w-2 h-2 rounded-full bg-amber-500 animate-ping" />
+            <span>⚡ Delivery in 10 Mins • <span className="underline cursor-pointer">Mumbai 400001</span></span>
+          </div>
+
           {/* Search Bar */}
-          <form onSubmit={handleSearchSubmit} className="hidden md:flex flex-1 max-w-md mx-8 relative">
+          <form onSubmit={handleSearchSubmit} className="hidden md:flex flex-1 max-w-md mx-6 relative">
             <input
               type="text"
-              placeholder="Search tomatoes, mangoes, basmati rice, milk..."
+              placeholder="Search 10-min groceries: milk, bread, tomatoes, mangoes, rice..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-slate-100/80 border border-slate-200 rounded-full py-2.5 pl-11 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all"
+              className="w-full bg-slate-100/90 border border-slate-200/80 rounded-2xl py-2.5 pl-11 pr-4 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all shadow-inner"
             />
-            <Search className="w-4 h-4 text-slate-400 absolute left-4 top-3.5" />
+            <Search className="w-4 h-4 text-slate-400 absolute left-4 top-3" />
           </form>
 
           {/* Nav Links & Controls */}
@@ -169,6 +167,7 @@ const Navbar = () => {
                   <img
                     src={user.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80'}
                     alt={user.name}
+                    onError={(e) => handleImageError(e, 'avatar')}
                     className="w-8 h-8 rounded-full object-cover ring-2 ring-brand-500/30"
                   />
                   <span className="hidden md:inline text-xs font-bold text-slate-800 pr-1 max-w-[100px] truncate">

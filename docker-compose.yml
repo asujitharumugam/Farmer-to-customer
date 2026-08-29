@@ -1,0 +1,156 @@
+version: '3.8'
+
+# =========================================================
+# Phase 26: Full Multi-Container Local & Staging Orchestration
+# Krishi Bazaar - Farmer to Customer Platform
+# =========================================================
+
+networks:
+  krishi-bazaar-network:
+    driver: bridge
+
+volumes:
+  mongo_data:
+    driver: local
+  redis_data:
+    driver: local
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local
+
+services:
+  # -------------------------------------------------------
+  # Database Service: MongoDB
+  # -------------------------------------------------------
+  mongodb:
+    image: mongo:7.0-jammy
+    container_name: krishi-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: farm_to_table
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - krishi-bazaar-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    resources:
+      limits:
+        cpus: '1.0'
+        memory: 1024M
+
+  # -------------------------------------------------------
+  # Caching & Session Store: Redis
+  # -------------------------------------------------------
+  redis:
+    image: redis:7.2-alpine
+    container_name: krishi-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - krishi-bazaar-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    resources:
+      limits:
+        cpus: '0.5'
+        memory: 256M
+
+  # -------------------------------------------------------
+  # Backend Service: Node.js Express API
+  # -------------------------------------------------------
+  backend:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: krishi-backend-api
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    environment:
+      PORT: 5000
+      NODE_ENV: production
+      MONGO_URI: mongodb://mongodb:27017/farm_to_table
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: super_secret_farm_to_table_jwt_key_2026_production
+      JWT_EXPIRES_IN: 7d
+      CLOUDINARY_CLOUD_NAME: demo_cloud
+      CLOUDINARY_API_KEY: 123456789012345
+      CLOUDINARY_API_SECRET: demo_cloudinary_secret
+      STRIPE_SECRET_KEY: sk_test_mock_stripe_key
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - krishi-bazaar-network
+    resources:
+      limits:
+        cpus: '1.5'
+        memory: 1024M
+
+  # -------------------------------------------------------
+  # Frontend Service: React + Nginx
+  # -------------------------------------------------------
+  frontend:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: krishi-frontend-web
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - krishi-bazaar-network
+    resources:
+      limits:
+        cpus: '0.5'
+        memory: 256M
+
+  # -------------------------------------------------------
+  # Observability: Prometheus
+  # -------------------------------------------------------
+  prometheus:
+    image: prom/prometheus:v2.48.0
+    container_name: krishi-prometheus
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./infra/monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./infra/monitoring/alerts.yml:/etc/prometheus/alerts.yml:ro
+      - prometheus_data:/prometheus
+    networks:
+      - krishi-bazaar-network
+
+  # -------------------------------------------------------
+  # Observability: Grafana Dashboards
+  # -------------------------------------------------------
+  grafana:
+    image: grafana/grafana:10.2.2
+    container_name: krishi-grafana
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: admin_krishi_password_2026
+    volumes:
+      - grafana_data:/var/lib/grafana
+    networks:
+      - krishi-bazaar-network

@@ -3,6 +3,7 @@ import { Tractor, Plus, Sprout, ShoppingBag, Clock, AlertCircle, CheckCircle2, I
 import Badge from '../components/common/Badge';
 import AddProduceModal from '../components/farmer/AddProduceModal';
 import api from '../services/api';
+import { handleImageError } from '../utils/imageUtils';
 
 const FarmerDashboard = () => {
   const [farmProfile, setFarmProfile] = useState(null);
@@ -218,6 +219,7 @@ const FarmerDashboard = () => {
                         <img
                           src={p.images?.[0] || 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=100&q=80'}
                           alt={p.title}
+                          onError={(e) => handleImageError(e, 'produce')}
                           className="w-10 h-10 object-cover rounded-xl border"
                         />
                         <div>

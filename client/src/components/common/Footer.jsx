@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Sprout, ShieldCheck, Heart, Truck, MapPin } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import Logo from './Logo';
 
 const Footer = () => {
   const [email, setEmail] = useState('');
@@ -12,6 +13,7 @@ const Footer = () => {
       setSubscribed(true);
     }
   };
+
   return (
     <footer className="bg-slate-900 text-slate-300 pt-16 pb-12 border-t border-slate-800 font-sans mt-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -53,12 +55,9 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-10 py-12">
           
           <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-brand-600 flex items-center justify-center text-white font-bold">
-                🌱
-              </div>
-              <span className="text-xl font-extrabold text-white">FarmDirect</span>
-            </div>
+            <Link to="/">
+              <Logo size="md" variant="light" />
+            </Link>
             <p className="text-xs text-slate-400 leading-relaxed">
               Empowering independent farmers with fair prices while giving consumers direct access to fresh, seasonal, and organic harvest.
             </p>

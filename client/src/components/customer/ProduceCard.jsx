@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Calendar, ShoppingBag, MapPin, Star } from 'lucide-react';
 import Badge from '../common/Badge';
 import { useCart } from '../../context/CartContext';
+import { handleImageError } from '../../utils/imageUtils';
 
 const ProduceCard = ({ product }) => {
   const { addToCart } = useCart();
@@ -21,6 +22,7 @@ const ProduceCard = ({ product }) => {
         <img
           src={displayImg}
           alt={product.title}
+          onError={(e) => handleImageError(e, 'produce')}
           className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-700 ease-out"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-slate-950/40 via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity" />
@@ -70,18 +72,25 @@ const ProduceCard = ({ product }) => {
         {/* Footer Price & Add Button */}
         <div className="pt-3.5 border-t border-slate-100 flex items-center justify-between">
           <div>
-            <span className="text-xl font-black text-slate-900 font-sans tracking-tight">
-              ₹{product.pricePerUnit?.toFixed(2)}
+            <div className="flex items-center gap-1.5">
+              <span className="text-xl font-black text-slate-900 font-sans tracking-tight">
+                ₹{product.pricePerUnit?.toFixed(2)}
+              </span>
+              <span className="text-[11px] font-bold text-slate-400 line-through">
+                ₹{(product.pricePerUnit * 1.25).toFixed(0)}
+              </span>
+            </div>
+            <span className="text-[10px] font-extrabold text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">
+              SAVE 20%
             </span>
-            <span className="text-xs font-bold text-slate-400"> / {product.unit}</span>
           </div>
 
           <button
             onClick={() => addToCart(product)}
             disabled={product.stockQuantity <= 0}
-            className="flex items-center gap-1.5 text-xs font-extrabold bg-gradient-to-r from-brand-600 to-emerald-600 hover:from-brand-700 hover:to-emerald-700 disabled:from-slate-300 disabled:to-slate-300 text-white px-4 py-2.5 rounded-2xl shadow-md shadow-brand-600/20 hover:shadow-xl hover:scale-105 transition-all active:scale-95"
+            className="flex items-center gap-1.5 text-xs font-black bg-gradient-to-r from-brand-600 to-emerald-600 hover:from-brand-700 hover:to-emerald-700 disabled:from-slate-300 disabled:to-slate-300 text-white px-4 py-2.5 rounded-2xl shadow-md shadow-brand-600/20 hover:shadow-xl hover:scale-105 transition-all active:scale-95"
           >
-            <ShoppingBag className="w-4 h-4" /> Add to Cart
+            <ShoppingBag className="w-4 h-4" /> Add
           </button>
         </div>
       </div>
