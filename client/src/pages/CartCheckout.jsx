@@ -5,6 +5,7 @@ import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import { handleImageError } from '../utils/imageUtils';
+import { saveNewOrder } from '../utils/orderStorage';
 
 const CartCheckout = () => {
   const { cart, cartTotal, clearCart } = useCart();
@@ -12,7 +13,8 @@ const CartCheckout = () => {
   const navigate = useNavigate();
 
   // Accordion / Stepper State (Flipkart Flow)
-  const [activeStep, setActiveStep] = useState(3); // 1: Login, 2: Address, 3: Order Summary, 4: Payment
+  const [activeStep, setActiveStep] = useState(2); // 1: Login, 2: Address (Default active), 3: Order Summary, 4: Payment
+  const [addressError, setAddressError] = useState('');
 
   // Address State
   const [address, setAddress] = useState({
@@ -44,15 +46,28 @@ const CartCheckout = () => {
   const [submitting, setSubmitting] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState(null);
 
-  // ✅ FIXED: Delivery is FREE above ₹199, else ₹29 flat (like Blinkit/Meesho)
+  // ✅ Delivery is FREE above ₹199, else ₹29 flat
   const deliveryFee = cartTotal >= 199 ? 0 : 29;
-  // ✅ FIXED: Only apply discount if user has a coupon (no hidden auto-deductions)
   const discount = 0;
   const grandTotal = cartTotal + deliveryFee;
+
+  const validateAddress = () => {
+    if (!address.street.trim() || !address.city.trim() || !address.state.trim() || !address.zipCode.trim() || !address.phone.trim()) {
+      setAddressError('Please fill out all required address & contact fields before proceeding.');
+      setActiveStep(2);
+      return false;
+    }
+    setAddressError('');
+    return true;
+  };
 
   const handlePlaceOrder = async (e) => {
     if (e) e.preventDefault();
     if (cart.length === 0) return;
+
+    if (!validateAddress()) {
+      return;
+    }
 
     if (paymentOption === 'cod' && captchaInput !== captchaCode) {
       alert('Security Captcha Code does not match. Please enter the 3-digit code shown.');
@@ -60,6 +75,24 @@ const CartCheckout = () => {
     }
 
     setSubmitting(true);
+
+    const demoOrder = {
+      _id: 'ord-' + Date.now(),
+      orderNumber: 'FBM-' + Math.floor(100000 + Math.random() * 900000),
+      customer: { name: user?.name || 'Customer', phone: address.phone },
+      totalAmount: grandTotal,
+      orderStatus: 'pending',
+      deliveryAddress: address,
+      items: cart.map(item => ({
+        title: item.title,
+        quantity: item.quantity,
+        pricePerUnit: item.pricePerUnit,
+        unit: item.unit || 'kg',
+        totalPrice: item.pricePerUnit * item.quantity
+      })),
+      paymentInfo: { method: paymentOption, status: paymentOption === 'cod' ? 'pending' : 'paid' },
+      createdAt: new Date().toISOString()
+    };
 
     try {
       const res = await api.post('/orders', {
@@ -73,18 +106,12 @@ const CartCheckout = () => {
       });
 
       if (res.data.success) {
+        saveNewOrder(res.data.data.order);
         setOrderSuccess(res.data.data.order);
         clearCart();
       }
     } catch (err) {
-      // Demo order creation fallback if backend API offline
-      const demoOrder = {
-        orderNumber: 'ORD-' + Math.floor(100000 + Math.random() * 900000),
-        totalAmount: grandTotal,
-        orderStatus: 'pending',
-        paymentInfo: { method: paymentOption, status: paymentOption === 'cod' ? 'pending' : 'paid' },
-        createdAt: new Date()
-      };
+      saveNewOrder(demoOrder);
       setOrderSuccess(demoOrder);
       clearCart();
     } finally {
@@ -227,11 +254,17 @@ const CartCheckout = () => {
 
             {activeStep === 2 && (
               <div className="p-6 border-t border-slate-100 space-y-4 bg-slate-50/40">
+                {addressError && (
+                  <div className="p-3 bg-red-50 border border-red-200 text-red-700 text-xs font-extrabold rounded-xl">
+                    ⚠️ {addressError}
+                  </div>
+                )}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-bold text-slate-700">
                   <div>
                     <label className="block mb-1">Street Address</label>
                     <input
                       type="text"
+                      placeholder="e.g. 124 Harvest Lane, Apartment 4B"
                       value={address.street}
                       onChange={e => setAddress({ ...address, street: e.target.value })}
                       className="w-full bg-white border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-brand-500"
@@ -241,6 +274,7 @@ const CartCheckout = () => {
                     <label className="block mb-1">City</label>
                     <input
                       type="text"
+                      placeholder="e.g. Mumbai"
                       value={address.city}
                       onChange={e => setAddress({ ...address, city: e.target.value })}
                       className="w-full bg-white border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-brand-500"
@@ -250,6 +284,7 @@ const CartCheckout = () => {
                     <label className="block mb-1">State</label>
                     <input
                       type="text"
+                      placeholder="e.g. Maharashtra"
                       value={address.state}
                       onChange={e => setAddress({ ...address, state: e.target.value })}
                       className="w-full bg-white border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-brand-500"
@@ -259,15 +294,29 @@ const CartCheckout = () => {
                     <label className="block mb-1">Pincode / Zip Code</label>
                     <input
                       type="text"
+                      placeholder="e.g. 400001"
                       value={address.zipCode}
                       onChange={e => setAddress({ ...address, zipCode: e.target.value })}
                       className="w-full bg-white border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-brand-500"
                     />
                   </div>
+                  <div className="sm:col-span-2">
+                    <label className="block mb-1">Mobile Phone Number (for Delivery Updates)</label>
+                    <input
+                      type="tel"
+                      placeholder="e.g. +91 98765 43210"
+                      value={address.phone}
+                      onChange={e => setAddress({ ...address, phone: e.target.value })}
+                      className="w-full bg-white border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-brand-500"
+                    />
+                  </div>
                 </div>
                 <button
-                  onClick={() => setActiveStep(3)}
-                  className="px-6 py-2.5 bg-brand-600 text-white text-xs font-extrabold rounded-xl shadow-sm hover:bg-brand-700"
+                  type="button"
+                  onClick={() => {
+                    if (validateAddress()) setActiveStep(3);
+                  }}
+                  className="px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white text-xs font-black rounded-xl shadow-md transition-all"
                 >
                   Deliver Here & Continue
                 </button>

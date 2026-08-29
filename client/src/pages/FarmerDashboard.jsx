@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Tractor, Plus, Sprout, ShoppingBag, Clock, AlertCircle, CheckCircle2, IndianRupee, Edit, Trash2 } from 'lucide-react';
+import { Tractor, Plus, Sprout, ShoppingBag, Clock, AlertCircle, CheckCircle2, IndianRupee, Edit, Trash2, Phone, MapPin, Package, Check, XCircle, Truck } from 'lucide-react';
 import Badge from '../components/common/Badge';
 import AddProduceModal from '../components/farmer/AddProduceModal';
 import api from '../services/api';
 import { handleImageError } from '../utils/imageUtils';
+import { getStoredOrders, updateOrderStatusInStorage } from '../utils/orderStorage';
 
 const FarmerDashboard = () => {
   const [farmProfile, setFarmProfile] = useState(null);
@@ -12,7 +13,7 @@ const FarmerDashboard = () => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState('inventory'); // 'inventory' | 'orders'
+  const [activeTab, setActiveTab] = useState('orders'); // 'orders' | 'inventory'
 
   const fetchData = async () => {
     setLoading(true);
@@ -26,13 +27,13 @@ const FarmerDashboard = () => {
 
       if (farmRes.data.success) setFarmProfile(farmRes.data.data.farm);
       if (prodRes.data.success) setProducts(prodRes.data.data.products);
-      if (ordRes.data.success) setOrders(ordRes.data.data.orders);
+      if (ordRes.data.success && ordRes.data.data.orders.length > 0) setOrders(ordRes.data.data.orders);
+      else setOrders(getStoredOrders());
       if (catRes.data.success) setCategories(catRes.data.data.categories);
     } catch (err) {
-      console.warn('Using demo farmer dataset');
       setFarmProfile(demoFarmProfile);
       setProducts(demoFarmerProducts);
-      setOrders(demoFarmerOrders);
+      setOrders(getStoredOrders());
       setCategories(demoCategories);
     } finally {
       setLoading(false);
@@ -45,12 +46,12 @@ const FarmerDashboard = () => {
 
   const handleUpdateOrderStatus = async (orderId, newStatus) => {
     try {
-      const res = await api.patch(`/orders/${orderId}/status`, { status: newStatus });
-      if (res.data.success) {
-        setOrders(orders.map(o => o._id === orderId ? { ...o, orderStatus: newStatus } : o));
-      }
+      await api.patch(`/orders/${orderId}/status`, { status: newStatus });
+      const updated = updateOrderStatusInStorage(orderId, newStatus);
+      setOrders(updated);
     } catch (err) {
-      alert(err.response?.data?.message || 'Failed to update order status');
+      const updated = updateOrderStatusInStorage(orderId, newStatus);
+      setOrders(updated);
     }
   };
 
@@ -58,14 +59,12 @@ const FarmerDashboard = () => {
     const title = product.title || 'this produce item';
     if (!window.confirm(`Are you sure you want to delete "${title}"? This item will be permanently removed from your catalog and customer shop.`)) return;
     
-    // Remove from UI immediately for snappy feedback
     setProducts(prevProducts => prevProducts.filter(p => p._id !== product._id));
 
     try {
       await api.delete(`/products/${product._id}`);
     } catch (err) {
       console.warn('API deletion fallback handled:', err);
-      // Even if API fails (e.g. demo data ID), local state remains filtered
     }
   };
 
@@ -73,16 +72,20 @@ const FarmerDashboard = () => {
     try {
       const isCurrentlyAvailable = product.stockQuantity > 0 && product.status !== 'out_of_stock';
       const newStock = isCurrentlyAvailable ? 0 : 50;
-      const res = await api.patch(`/products/${product._id}/stock`, { stockQuantity: newStock });
-      if (res.data.success) {
-        setProducts(products.map(p => p._id === product._id ? {
-          ...p,
-          stockQuantity: newStock,
-          status: newStock > 0 ? 'available' : 'out_of_stock'
-        } : p));
-      }
+      await api.patch(`/products/${product._id}/stock`, { stockQuantity: newStock });
+      setProducts(products.map(p => p._id === product._id ? {
+        ...p,
+        stockQuantity: newStock,
+        status: newStock > 0 ? 'available' : 'out_of_stock'
+      } : p));
     } catch (err) {
-      alert(err.response?.data?.message || 'Failed to update produce availability status');
+      const isCurrentlyAvailable = product.stockQuantity > 0;
+      const newStock = isCurrentlyAvailable ? 0 : 50;
+      setProducts(products.map(p => p._id === product._id ? {
+        ...p,
+        stockQuantity: newStock,
+        status: newStock > 0 ? 'available' : 'out_of_stock'
+      } : p));
     }
   };
 
@@ -91,11 +94,12 @@ const FarmerDashboard = () => {
   }
 
   const isApproved = farmProfile?.verificationStatus === 'approved';
+  const pendingOrdersCount = orders.filter(o => !['completed', 'cancelled'].includes(o.orderStatus)).length;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8 font-sans">
       
-      {/* Farmer Banner & Status Bar */}
+      {/* Farmer Header & Status Bar */}
       <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-4">
           <div className="w-14 h-14 rounded-2xl bg-earth-500/20 text-earth-800 flex items-center justify-center font-bold text-2xl border border-earth-200">
@@ -111,7 +115,7 @@ const FarmerDashboard = () => {
               </Badge>
             </div>
             <p className="text-xs font-semibold text-slate-500 mt-1">
-              Farmer Management Console • Direct Harvest Sales
+              Farmer Management Console • Direct Harvest Sales & Customer Order Dispatch
             </p>
           </div>
         </div>
@@ -120,7 +124,7 @@ const FarmerDashboard = () => {
         <button
           onClick={() => setIsAddModalOpen(true)}
           disabled={!isApproved}
-          className="inline-flex items-center gap-2 bg-brand-600 hover:bg-brand-700 disabled:bg-slate-300 text-white font-bold text-xs px-5 py-3 rounded-2xl shadow-md transition-all shrink-0"
+          className="inline-flex items-center gap-2 bg-brand-600 hover:bg-brand-700 disabled:bg-slate-300 text-white font-black text-xs px-5 py-3 rounded-2xl shadow-md transition-all shrink-0"
         >
           <Plus className="w-4 h-4" /> Add Produce Listing
         </button>
@@ -140,30 +144,33 @@ const FarmerDashboard = () => {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
         <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center justify-between">
           <div>
-            <p className="text-xs font-extrabold uppercase text-slate-400">Active Listings</p>
-            <h3 className="text-2xl font-extrabold text-slate-900 mt-1">{products.length}</h3>
+            <p className="text-xs font-extrabold uppercase text-slate-400">Incoming Customer Orders</p>
+            <h3 className="text-2xl font-extrabold text-slate-900 mt-1">{orders.length} Orders</h3>
+            <p className="text-[11px] font-bold text-emerald-600 mt-0.5">{pendingOrdersCount} Active Bookings</p>
           </div>
           <div className="w-12 h-12 rounded-2xl bg-brand-50 text-brand-600 flex items-center justify-center font-bold">
-            <Sprout className="w-6 h-6" />
-          </div>
-        </div>
-
-        <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center justify-between">
-          <div>
-            <p className="text-xs font-extrabold uppercase text-slate-400">Incoming Orders</p>
-            <h3 className="text-2xl font-extrabold text-slate-900 mt-1">{orders.length}</h3>
-          </div>
-          <div className="w-12 h-12 rounded-2xl bg-earth-50 text-earth-600 flex items-center justify-center font-bold">
             <ShoppingBag className="w-6 h-6" />
           </div>
         </div>
 
         <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center justify-between">
           <div>
-            <p className="text-xs font-extrabold uppercase text-slate-400">Total Farm Revenue</p>
+            <p className="text-xs font-extrabold uppercase text-slate-400">Harvest Inventory</p>
+            <h3 className="text-2xl font-extrabold text-slate-900 mt-1">{products.length} Products</h3>
+            <p className="text-[11px] font-bold text-slate-500 mt-0.5">Live on Shop</p>
+          </div>
+          <div className="w-12 h-12 rounded-2xl bg-earth-50 text-earth-600 flex items-center justify-center font-bold">
+            <Sprout className="w-6 h-6" />
+          </div>
+        </div>
+
+        <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center justify-between">
+          <div>
+            <p className="text-xs font-extrabold uppercase text-slate-400">Total Revenue Earned</p>
             <h3 className="text-2xl font-extrabold text-slate-900 mt-1">
               ₹{orders.reduce((sum, o) => sum + (o.totalAmount || 0), 0).toFixed(2)}
             </h3>
+            <p className="text-[11px] font-bold text-purple-600 mt-0.5">0% Distributor Fee</p>
           </div>
           <div className="w-12 h-12 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center font-bold">
             <IndianRupee className="w-6 h-6" />
@@ -174,28 +181,163 @@ const FarmerDashboard = () => {
       {/* Tabs Switcher */}
       <div className="flex border-b border-slate-200">
         <button
-          onClick={() => setActiveTab('inventory')}
-          className={`pb-3 px-4 text-xs font-extrabold transition-all border-b-2 ${
-            activeTab === 'inventory'
-              ? 'border-brand-600 text-brand-700'
-              : 'border-transparent text-slate-500 hover:text-slate-800'
-          }`}
-        >
-          Produce Inventory ({products.length})
-        </button>
-        <button
           onClick={() => setActiveTab('orders')}
-          className={`pb-3 px-4 text-xs font-extrabold transition-all border-b-2 ${
+          className={`pb-3 px-5 text-xs font-black transition-all border-b-2 flex items-center gap-2 ${
             activeTab === 'orders'
               ? 'border-brand-600 text-brand-700'
               : 'border-transparent text-slate-500 hover:text-slate-800'
           }`}
         >
-          Customer Bookings ({orders.length})
+          <ShoppingBag className="w-4 h-4" /> Customer Bookings ({orders.length})
+          {pendingOrdersCount > 0 && (
+            <span className="bg-emerald-600 text-white text-[10px] font-black px-2 py-0.5 rounded-full animate-pulse">
+              {pendingOrdersCount} New
+            </span>
+          )}
+        </button>
+        <button
+          onClick={() => setActiveTab('inventory')}
+          className={`pb-3 px-5 text-xs font-black transition-all border-b-2 flex items-center gap-2 ${
+            activeTab === 'inventory'
+              ? 'border-brand-600 text-brand-700'
+              : 'border-transparent text-slate-500 hover:text-slate-800'
+          }`}
+        >
+          <Sprout className="w-4 h-4" /> Produce Catalog ({products.length})
         </button>
       </div>
 
-      {/* Tab 1: Produce Inventory Table */}
+      {/* TAB 1: INCOMING CUSTOMER ORDERS */}
+      {activeTab === 'orders' && (
+        <div className="space-y-4">
+          {orders.length === 0 ? (
+            <div className="bg-white rounded-3xl p-12 text-center border border-slate-200 max-w-md mx-auto space-y-3">
+              <ShoppingBag className="w-12 h-12 text-slate-300 mx-auto" />
+              <h3 className="text-base font-black text-slate-800">No Orders Received Yet</h3>
+              <p className="text-xs text-slate-400 font-semibold">New customer orders will appear here for fulfillment.</p>
+            </div>
+          ) : (
+            orders.map((ord) => (
+              <div key={ord._id} className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-4">
+                
+                {/* Order Top Bar */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-xs font-black text-brand-700 bg-brand-50 px-2.5 py-0.5 rounded-full border border-brand-200">
+                        {ord.orderNumber}
+                      </span>
+                      <span className="text-xs font-black text-slate-900">
+                        Customer: {ord.customer?.name || 'Customer'}
+                      </span>
+                      <span className="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700">
+                        {ord.paymentInfo?.method?.toUpperCase() || 'COD'} • {ord.paymentInfo?.status}
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-500 font-semibold">
+                      Placed: {new Date(ord.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                    </p>
+                  </div>
+
+                  <div className="text-left sm:text-right">
+                    <span className="text-lg font-black text-slate-900">₹{ord.totalAmount?.toFixed(2)}</span>
+                    <p className="text-[11px] font-extrabold text-emerald-700">Harvest Total</p>
+                  </div>
+                </div>
+
+                {/* Items & Delivery Info */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-semibold text-slate-700">
+                  <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 space-y-2">
+                    <h4 className="text-[11px] font-black uppercase text-slate-400">Items Ordered:</h4>
+                    <div className="space-y-1">
+                      {ord.items?.map((it, idx) => (
+                        <div key={idx} className="flex justify-between items-center text-xs">
+                          <span className="font-bold text-slate-800">🧺 {it.title}</span>
+                          <span className="font-extrabold text-slate-900">{it.quantity} × ₹{it.pricePerUnit?.toFixed(2)}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 space-y-1.5">
+                    <h4 className="text-[11px] font-black uppercase text-slate-400 flex items-center gap-1">
+                      <MapPin className="w-3.5 h-3.5 text-brand-600" /> Customer Delivery Address:
+                    </h4>
+                    <p className="font-bold text-slate-800">
+                      {ord.deliveryAddress?.street}, {ord.deliveryAddress?.city}, {ord.deliveryAddress?.state} - {ord.deliveryAddress?.zipCode}
+                    </p>
+                    {ord.deliveryAddress?.phone && (
+                      <p className="text-[11px] font-extrabold text-amber-800 flex items-center gap-1">
+                        <Phone className="w-3.5 h-3.5 text-amber-600" /> Customer Phone: <a href={`tel:${ord.deliveryAddress.phone}`} className="underline">{ord.deliveryAddress.phone}</a>
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Action Stepper Bar */}
+                <div className="pt-2 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-black text-slate-600">Current Status:</span>
+                    <span className="text-xs font-black uppercase px-3 py-1 rounded-full bg-brand-100 text-brand-800 border border-brand-300">
+                      {ord.orderStatus}
+                    </span>
+                  </div>
+
+                  <div className="flex flex-wrap gap-2">
+                    {ord.orderStatus === 'pending' && (
+                      <button
+                        onClick={() => handleUpdateOrderStatus(ord._id, 'accepted')}
+                        className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs rounded-xl shadow-sm flex items-center gap-1"
+                      >
+                        <Check className="w-4 h-4" /> Accept Order
+                      </button>
+                    )}
+
+                    {['pending', 'accepted'].includes(ord.orderStatus) && (
+                      <button
+                        onClick={() => handleUpdateOrderStatus(ord._id, 'harvested_packed')}
+                        className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-black text-xs rounded-xl shadow-sm flex items-center gap-1"
+                      >
+                        <Package className="w-4 h-4" /> Mark Packed
+                      </button>
+                    )}
+
+                    {['harvested_packed'].includes(ord.orderStatus) && (
+                      <button
+                        onClick={() => handleUpdateOrderStatus(ord._id, 'out_for_delivery')}
+                        className="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white font-black text-xs rounded-xl shadow-sm flex items-center gap-1"
+                      >
+                        <Truck className="w-4 h-4" /> Send Out For Delivery
+                      </button>
+                    )}
+
+                    {['out_for_delivery'].includes(ord.orderStatus) && (
+                      <button
+                        onClick={() => handleUpdateOrderStatus(ord._id, 'completed')}
+                        className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs rounded-xl shadow-sm flex items-center gap-1"
+                      >
+                        <CheckCircle2 className="w-4 h-4" /> Mark Completed
+                      </button>
+                    )}
+
+                    {ord.orderStatus !== 'cancelled' && ord.orderStatus !== 'completed' && (
+                      <button
+                        onClick={() => handleUpdateOrderStatus(ord._id, 'cancelled')}
+                        className="px-3 py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold text-xs rounded-xl"
+                      >
+                        Cancel
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+              </div>
+            ))
+          )}
+        </div>
+      )}
+
+      {/* TAB 2: PRODUCE CATALOG INVENTORY */}
       {activeTab === 'inventory' && (
         <div className="bg-white rounded-3xl border border-slate-200/80 shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
@@ -207,7 +349,7 @@ const FarmerDashboard = () => {
                   <th className="p-4">Stock Status</th>
                   <th className="p-4">Harvest Date</th>
                   <th className="p-4">Organic</th>
-                  <th className="p-4 text-right">Actions & Availability</th>
+                  <th className="p-4 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-xs font-semibold text-slate-700">
@@ -249,7 +391,6 @@ const FarmerDashboard = () => {
                               ? 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100'
                               : 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100'
                           }`}
-                          title={isAvailable ? 'Mark as Out of Stock' : 'Mark as Available'}
                         >
                           {isAvailable ? 'Mark Unavailable' : 'Mark Available'}
                         </button>
@@ -257,7 +398,6 @@ const FarmerDashboard = () => {
                         <button
                           onClick={() => handleDeleteProduct(p)}
                           className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-extrabold bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 transition-all active:scale-95"
-                          title="Delete produce listing"
                         >
                           <Trash2 className="w-3.5 h-3.5" /> Delete
                         </button>
@@ -268,46 +408,6 @@ const FarmerDashboard = () => {
               </tbody>
             </table>
           </div>
-        </div>
-      )}
-
-      {/* Tab 2: Incoming Orders List */}
-      {activeTab === 'orders' && (
-        <div className="space-y-4">
-          {orders.map((ord) => (
-            <div key={ord._id} className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <div className="space-y-1">
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-extrabold text-brand-700 bg-brand-50 px-2 py-0.5 rounded border border-brand-200">
-                    {ord.orderNumber}
-                  </span>
-                  <span className="text-xs font-bold text-slate-800">
-                    Customer: {ord.customer?.name || 'Customer'}
-                  </span>
-                </div>
-                <p className="text-xs text-slate-500">
-                  Total: <strong className="text-slate-900">₹{ord.totalAmount?.toFixed(2)}</strong> • Address: {ord.deliveryAddress?.street}, {ord.deliveryAddress?.city}
-                </p>
-              </div>
-
-              {/* Status Selector Dropdown */}
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-bold text-slate-600">Update Fulfillment:</span>
-                <select
-                  value={ord.orderStatus}
-                  onChange={(e) => handleUpdateOrderStatus(ord._id, e.target.value)}
-                  className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 focus:ring-2 focus:ring-brand-500"
-                >
-                  <option value="pending">1. Pending Review</option>
-                  <option value="accepted">2. Accepted Order</option>
-                  <option value="harvested_packed">3. Harvested & Packed</option>
-                  <option value="out_for_delivery">4. Out for Delivery</option>
-                  <option value="completed">5. Completed</option>
-                  <option value="cancelled">Cancelled</option>
-                </select>
-              </div>
-            </div>
-          ))}
         </div>
       )}
 
@@ -335,7 +435,33 @@ const demoFarmerProducts = [
 ];
 
 const demoFarmerOrders = [
-  { _id: 'ord1', orderNumber: 'ORD-882910', customer: { name: 'Priya Sharma' }, totalAmount: 170.00, orderStatus: 'harvested_packed', deliveryAddress: { street: 'MG Road, Flat 402', city: 'Mumbai' } }
+  {
+    _id: 'ord1',
+    orderNumber: 'FBM-882910',
+    customer: { name: 'Priya Sharma' },
+    totalAmount: 170.00,
+    orderStatus: 'pending',
+    paymentInfo: { method: 'upi', status: 'paid' },
+    createdAt: new Date(),
+    deliveryAddress: { street: 'MG Road, Flat 402', city: 'Mumbai', state: 'MH', zipCode: '400001', phone: '+91 98765 43210' },
+    items: [
+      { title: 'Farm Fresh Red Tomatoes (Tamatar)', quantity: 2, pricePerUnit: 20, totalPrice: 40 },
+      { title: 'Sweet Alphonso Mangoes (Aam)', quantity: 2, pricePerUnit: 65, totalPrice: 130 }
+    ]
+  },
+  {
+    _id: 'ord2',
+    orderNumber: 'FBM-759201',
+    customer: { name: 'Amit Patel' },
+    totalAmount: 60.00,
+    orderStatus: 'harvested_packed',
+    paymentInfo: { method: 'cod', status: 'pending' },
+    createdAt: new Date(Date.now() - 3600000),
+    deliveryAddress: { street: '12 Park Street, Flat 9', city: 'Pune', state: 'MH', zipCode: '411001', phone: '+91 98765 11223' },
+    items: [
+      { title: 'Free-Range Country Hen Eggs (Ande)', quantity: 1, pricePerUnit: 60, totalPrice: 60 }
+    ]
+  }
 ];
 
 const demoCategories = [
