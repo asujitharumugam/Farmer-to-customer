@@ -85,6 +85,8 @@ exports.createProduct = catchAsync(async (req, res, next) => {
       const url = await uploadToCloudinary(file.buffer, 'produce_items');
       imageUrls.push(url);
     }
+  } else if (req.body.imageUrl) {
+    imageUrls.push(req.body.imageUrl);
   } else {
     imageUrls.push('https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=800&q=80');
   }

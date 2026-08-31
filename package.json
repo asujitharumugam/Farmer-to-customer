@@ -3,8 +3,10 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "server": "npm run dev --prefix server",
+    "dev": "npm run client",
+    "start": "npm run client",
     "client": "npm run dev --prefix client",
+    "server": "npm run dev --prefix server",
     "seed": "npm run seed --prefix server"
   }
 }
