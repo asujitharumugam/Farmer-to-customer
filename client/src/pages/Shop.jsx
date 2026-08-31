@@ -155,51 +155,51 @@ const Shop = () => {
 const demoShopProducts = [
   {
     _id: 'p1',
-    title: 'Farm Fresh Red Tomatoes (Tamatar)',
-    description: 'Naturally ripened fresh juicy red tomatoes harvested daily.',
-    pricePerUnit: 20.00,
+    title: 'Madurai Country Organic Tomatoes (மதுரை தக்காளி)',
+    description: 'Juicy, rich sour-sweet country tomatoes harvested fresh from Madurai fields. 100% organic.',
+    pricePerUnit: 22.00,
     unit: 'kg',
-    stockQuantity: 150,
+    stockQuantity: 180,
     isOrganic: true,
     harvestDate: new Date(Date.now() + 86400000 * 2),
     images: ['https://images.unsplash.com/photo-1592924357228-91a4daadcfea?auto=format&fit=crop&w=800&q=80'],
-    farm: { _id: 'f1', farmName: 'Green Acres Organic Valley' }
+    farm: { _id: 'f1', farmName: 'Kongu Organic Agriculture Farm' }
   },
   {
     _id: 'p2',
-    title: 'Sweet Alphonso Mangoes (Aam)',
-    description: 'Naturally tree-ripened organic sweet Alphonso mangoes with rich aroma.',
-    pricePerUnit: 65.00,
+    title: 'Perambalur Small Onions / Chinna Vengayam (சின்ன வெங்காயம்)',
+    description: 'Pungent, highly aromatic authentic Tamil Nadu small shallot onions (Chinna Vengayam).',
+    pricePerUnit: 45.00,
     unit: 'kg',
-    stockQuantity: 80,
+    stockQuantity: 220,
     isOrganic: true,
     harvestDate: new Date(Date.now() + 86400000 * 1),
-    images: ['https://images.unsplash.com/photo-1553279768-865429fa0078?auto=format&fit=crop&w=800&q=80'],
-    farm: { _id: 'f1', farmName: 'Green Acres Organic Valley' }
+    images: ['https://images.unsplash.com/photo-1618512496248-a07fe83aa8cb?auto=format&fit=crop&w=800&q=80'],
+    farm: { _id: 'f1', farmName: 'Kongu Organic Agriculture Farm' }
   },
   {
     _id: 'p3',
-    title: 'Fresh Organic Palak (Spinach)',
-    description: 'Crisp green spinach washed in natural farm water.',
-    pricePerUnit: 12.00,
-    unit: 'piece',
+    title: 'Salem Malgova & Alphonso Mangoes (சேலம் மாம்பழம்)',
+    description: 'World-famous Salem organic Malgova mangoes, tree-ripened with irresistible natural sweetness.',
+    pricePerUnit: 120.00,
+    unit: 'kg',
     stockQuantity: 100,
     isOrganic: true,
     harvestDate: new Date(),
-    images: ['https://images.unsplash.com/photo-1576045057995-568f588f82fb?auto=format&fit=crop&w=800&q=80'],
-    farm: { _id: 'f1', farmName: 'Green Acres Organic Valley' }
+    images: ['https://images.unsplash.com/photo-1553279768-865429fa0078?auto=format&fit=crop&w=800&q=80'],
+    farm: { _id: 'f1', farmName: 'Kongu Organic Agriculture Farm' }
   },
   {
     _id: 'p4',
-    title: 'Wild Forest Raw Honey (Madhu)',
-    description: 'Unfiltered raw wildflower honey collected directly from farm apiaries.',
-    pricePerUnit: 120.00,
-    unit: 'piece',
-    stockQuantity: 40,
+    title: 'Thanjavur Deluxe Ponni Boiled Rice (தஞ்சாவூர் பொன்னி அரிசி)',
+    description: 'Premium aged Thanjavur Cauvery delta Ponni rice, fluffy and highly nutritious.',
+    pricePerUnit: 62.00,
+    unit: 'kg',
+    stockQuantity: 400,
     isOrganic: true,
     harvestDate: new Date(Date.now() - 86400000 * 5),
-    images: ['https://images.unsplash.com/photo-1587049352846-4a222e784d38?auto=format&fit=crop&w=800&q=80'],
-    farm: { _id: 'f1', farmName: 'Green Acres Organic Valley' }
+    images: ['https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=800&q=80'],
+    farm: { _id: 'f2', farmName: 'Cauvery Delta Bio Farms' }
   }
 ];
 

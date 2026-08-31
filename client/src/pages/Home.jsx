@@ -209,13 +209,15 @@ const Home = () => {
 const fallbackCategories = [
   { slug: 'vegetables', name: 'Fresh Vegetables', image: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=500&q=80' },
   { slug: 'fruits', name: 'Seasonal Fruits', image: 'https://images.unsplash.com/photo-1610832958506-aa56368176cf?auto=format&fit=crop&w=500&q=80' },
-  { slug: 'grains', name: 'Grains & Pulses', image: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=500&q=80' },
-  { slug: 'dairy', name: 'Dairy & Farm Eggs', image: 'https://images.unsplash.com/photo-1528750997573-59b89d56f4f7?auto=format&fit=crop&w=500&q=80' }
+  { slug: 'grains', name: 'Traditional Rice & Grains', image: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=500&q=80' },
+  { slug: 'dairy', name: 'Country Milk & Eggs', image: 'https://images.unsplash.com/photo-1508739773434-c26b3d09e071?auto=format&fit=crop&w=500&q=80' }
 ];
 
 const fallbackProducts = [
-  { _id: '1', title: 'Farm Fresh Red Tomatoes (Tamatar)', pricePerUnit: 20.00, unit: 'kg', stockQuantity: 150, isOrganic: true, images: ['https://images.unsplash.com/photo-1592924357228-91a4daadcfea?auto=format&fit=crop&w=800&q=80'] },
-  { _id: '2', title: 'Sweet Alphonso Mangoes (Aam)', pricePerUnit: 65.00, unit: 'kg', stockQuantity: 80, isOrganic: true, images: ['https://images.unsplash.com/photo-1553279768-865429fa0078?auto=format&fit=crop&w=800&q=80'] }
+  { _id: '1', title: 'Madurai Country Organic Tomatoes (மதுரை தக்காளி)', pricePerUnit: 22.00, unit: 'kg', stockQuantity: 180, isOrganic: true, images: ['https://images.unsplash.com/photo-1592924357228-91a4daadcfea?auto=format&fit=crop&w=800&q=80'], farm: { farmName: 'Kongu Organic Agriculture Farm' } },
+  { _id: '2', title: 'Perambalur Small Onions / Chinna Vengayam (சின்ன வெங்காயம்)', pricePerUnit: 45.00, unit: 'kg', stockQuantity: 220, isOrganic: true, images: ['https://images.unsplash.com/photo-1618512496248-a07fe83aa8cb?auto=format&fit=crop&w=800&q=80'], farm: { farmName: 'Kongu Organic Agriculture Farm' } },
+  { _id: '3', title: 'Salem Malgova & Alphonso Mangoes (சேலம் மாம்பழம்)', pricePerUnit: 120.00, unit: 'kg', stockQuantity: 100, isOrganic: true, images: ['https://images.unsplash.com/photo-1553279768-865429fa0078?auto=format&fit=crop&w=800&q=80'], farm: { farmName: 'Kongu Organic Agriculture Farm' } },
+  { _id: '4', title: 'Thanjavur Deluxe Ponni Boiled Rice (தஞ்சாவூர் அரிசி)', pricePerUnit: 62.00, unit: 'kg', stockQuantity: 400, isOrganic: true, images: ['https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=800&q=80'], farm: { farmName: 'Cauvery Delta Bio Farms' } }
 ];
 
 export default Home;
