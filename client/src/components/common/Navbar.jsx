@@ -3,12 +3,14 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { ShoppingBag, User, LogOut, Sprout, ShieldCheck, Tractor, Search, Menu, X, ChevronDown, Heart, Settings as SettingsIcon, Info, PhoneCall } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
+import { useWishlist } from '../../context/WishlistContext';
 import Logo from './Logo';
 import { handleImageError } from '../../utils/imageUtils';
 
 const Navbar = () => {
   const { user, logout, switchRoleDemo } = useAuth();
   const { cartItemCount, setIsDrawerOpen } = useCart();
+  const { wishlistCount } = useWishlist();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
@@ -32,16 +34,15 @@ const Navbar = () => {
           </Link>
 
           {/* Location Delivery Selector Badge */}
-          <div className="hidden xl:flex items-center gap-2 bg-amber-50 border border-amber-200/80 px-3.5 py-1.5 rounded-full text-xs font-black text-amber-900 shrink-0">
-            <span className="w-2 h-2 rounded-full bg-amber-500 animate-ping" />
-            <span>⚡ Delivery in 10 Mins • <span className="underline cursor-pointer">Mumbai 400001</span></span>
+          <div className="hidden xl:flex items-center gap-2 bg-emerald-50 border border-emerald-200/80 px-3.5 py-1.5 rounded-full text-xs font-black text-emerald-900 shrink-0">
+            <span>⚡ Delivery in 10 Mins in <span className="underline cursor-pointer">Chennai 600040, TN</span></span>
           </div>
 
           {/* Search Bar */}
           <form onSubmit={handleSearchSubmit} className="hidden md:flex flex-1 max-w-md mx-6 relative">
             <input
               type="text"
-              placeholder="Search 10-min groceries: milk, bread, tomatoes, mangoes, rice..."
+              placeholder="Search Tamil Nadu fresh produce: Chinna Vengayam, Salem Mangoes, Madurai Tomatoes..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full bg-slate-100/90 border border-slate-200/80 rounded-2xl py-2.5 pl-11 pr-4 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all shadow-inner"
@@ -145,6 +146,20 @@ const Navbar = () => {
                 Admin
               </button>
             </div>
+
+            {/* Wishlist Button */}
+            <Link
+              to="/wishlist"
+              className="relative p-2.5 rounded-full bg-slate-100 text-slate-700 hover:bg-rose-50 hover:text-rose-600 transition-colors"
+              aria-label="View Wishlist"
+            >
+              <Heart className="w-5 h-5" />
+              {wishlistCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-rose-500 text-white text-[11px] font-extrabold w-5 h-5 rounded-full flex items-center justify-center border-2 border-white animate-bounce">
+                  {wishlistCount}
+                </span>
+              )}
+            </Link>
 
             {/* Shopping Cart Button */}
             <button

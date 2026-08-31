@@ -14,4 +14,7 @@ router.get('/profile', farmerController.getMyFarmProfile);
 router.put('/profile', farmerController.updateFarmProfile);
 router.get('/dashboard-metrics', farmerController.getFarmerDashboardMetrics);
 
+router.post('/site-photos', upload.single('sitePhoto'), farmerController.uploadFarmSitePhoto);
+router.delete('/site-photos/:photoId', farmerController.deleteFarmSitePhoto);
+
 module.exports = router;

@@ -116,9 +116,6 @@ const Logo = ({ size = 'md', showText = true, variant = 'dark' }) => {
             strokeLinecap="round"
             fill="none"
           />
-
-          {/* Small Organic Dew Drop Accent */}
-          <circle cx="57" cy="34" r="3.5" fill="#FEF08A" />
         </svg>
       </div>
 

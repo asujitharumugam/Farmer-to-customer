@@ -18,11 +18,11 @@ const CartCheckout = () => {
 
   // Address State
   const [address, setAddress] = useState({
-    street: user?.addresses?.[0]?.street || '124 Harvest Lane, Apartment 4B',
-    city: user?.addresses?.[0]?.city || 'Mumbai',
-    state: user?.addresses?.[0]?.state || 'Maharashtra',
-    zipCode: user?.addresses?.[0]?.zipCode || '400001',
-    phone: user?.phone || '+91 98765 43210'
+    street: user?.addresses?.[0]?.street || '12th Main Road, Anna Nagar',
+    city: user?.addresses?.[0]?.city || 'Chennai',
+    state: user?.addresses?.[0]?.state || 'Tamil Nadu',
+    zipCode: user?.addresses?.[0]?.zipCode || '600040',
+    phone: user?.phone || '+91 98401 23456'
   });
 
   const [deliveryMethod, setDeliveryMethod] = useState('home_delivery');
@@ -274,7 +274,7 @@ const CartCheckout = () => {
                     <label className="block mb-1">City</label>
                     <input
                       type="text"
-                      placeholder="e.g. Mumbai"
+                      placeholder="e.g. Chennai"
                       value={address.city}
                       onChange={e => setAddress({ ...address, city: e.target.value })}
                       className="w-full bg-white border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-brand-500"

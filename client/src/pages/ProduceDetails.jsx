@@ -4,12 +4,14 @@ import { Calendar, ShoppingBag, MapPin, Star, ShieldCheck, Plus, Minus, ArrowLef
 import Badge from '../components/common/Badge';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
+import { useWishlist } from '../context/WishlistContext';
 import api from '../services/api';
 
 const ProduceDetails = () => {
   const { id } = useParams();
   const { addToCart } = useCart();
   const { user } = useAuth();
+  const { isInWishlist, toggleWishlist } = useWishlist();
 
   const [product, setProduct] = useState(null);
   const [reviews, setReviews] = useState([]);
@@ -128,9 +130,23 @@ const ProduceDetails = () => {
               </div>
             )}
 
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 leading-tight">
-              {product.title}
-            </h1>
+            <div className="flex items-start justify-between gap-4">
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 leading-tight">
+                {product.title}
+              </h1>
+
+              <button
+                onClick={() => toggleWishlist(product)}
+                className={`p-3 rounded-2xl shadow-sm border transition-all active:scale-90 ${
+                  isInWishlist(product._id)
+                    ? 'bg-rose-50 border-rose-200 text-rose-600'
+                    : 'bg-slate-50 border-slate-200 text-slate-400 hover:text-rose-500'
+                }`}
+                title={isInWishlist(product._id) ? 'Saved in Wishlist' : 'Add to Wishlist'}
+              >
+                <Heart className={`w-6 h-6 ${isInWishlist(product._id) ? 'fill-rose-500 text-rose-500' : ''}`} />
+              </button>
+            </div>
 
             <div className="flex items-baseline gap-2">
               <span className="text-3xl font-extrabold text-slate-900">
@@ -203,14 +219,44 @@ const ProduceDetails = () => {
 
       {/* Farm Story Card */}
       {product.farm && (
-        <div className="bg-gradient-to-r from-emerald-900 to-slate-900 text-white rounded-3xl p-8 sm:p-10 shadow-xl space-y-4">
-          <div className="flex items-center gap-2 text-brand-400 text-xs font-extrabold uppercase tracking-wider">
-            <MapPin className="w-4 h-4" /> About The Origin Farm
+        <div className="bg-gradient-to-r from-emerald-900 to-slate-900 text-white rounded-3xl p-8 sm:p-10 shadow-xl space-y-6">
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 text-brand-400 text-xs font-extrabold uppercase tracking-wider">
+              <MapPin className="w-4 h-4" /> About The Origin Farm
+            </div>
+            <h3 className="text-2xl font-extrabold">{product.farm.farmName || 'Green Acres Valley'}</h3>
+            <p className="text-xs sm:text-sm text-slate-300 font-medium leading-relaxed max-w-3xl">
+              {product.farm.story || 'Family-owned certified organic farm operating since 1998. We specialize in heirloom crops, crisp brassicas, and natural honey with zero synthetic fertilizers.'}
+            </p>
           </div>
-          <h3 className="text-2xl font-extrabold">{product.farm.farmName || 'Green Acres Valley'}</h3>
-          <p className="text-xs sm:text-sm text-slate-300 font-medium leading-relaxed max-w-3xl">
-            {product.farm.story || 'Family-owned certified organic farm operating since 1998. We specialize in heirloom crops, crisp brassicas, and natural honey with zero synthetic fertilizers.'}
-          </p>
+
+          {/* Real Farm Site Images Gallery */}
+          {product.farm.siteImages && product.farm.siteImages.length > 0 && (
+            <div className="pt-6 border-t border-emerald-800/80 space-y-3">
+              <h4 className="text-xs font-black text-emerald-300 uppercase tracking-wider flex items-center gap-1.5">
+                📸 Real Current Farm Site & Field Photos (Uploaded by Farmer)
+              </h4>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                {product.farm.siteImages.map((img, idx) => (
+                  <div key={idx} className="group relative rounded-2xl overflow-hidden bg-slate-950 aspect-[4/3] border border-white/10 shadow-lg">
+                    <img
+                      src={img.url}
+                      alt={img.caption || 'Farm site photo'}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/20 to-transparent p-3 flex flex-col justify-end">
+                      <p className="text-[11px] font-bold text-white line-clamp-2">
+                        {img.caption}
+                      </p>
+                      <span className="text-[9px] font-medium text-emerald-400 mt-0.5">
+                        Verified Farm Site Update
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
 

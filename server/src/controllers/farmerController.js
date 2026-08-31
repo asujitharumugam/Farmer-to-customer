@@ -118,3 +118,53 @@ exports.getFarmerDashboardMetrics = catchAsync(async (req, res, next) => {
     }
   });
 });
+
+exports.uploadFarmSitePhoto = catchAsync(async (req, res, next) => {
+  let farm = await FarmProfile.findOne({ user: req.user._id });
+  if (!farm) {
+    return next(new AppError('Farm profile not found. Please onboard your farm first.', 404));
+  }
+
+  let photoUrl = req.body.imageUrl || '';
+  if (req.file) {
+    photoUrl = await uploadToCloudinary(req.file.buffer, 'farm_site');
+  }
+
+  if (!photoUrl) {
+    return next(new AppError('Please upload an image file or provide an image URL.', 400));
+  }
+
+  const caption = req.body.caption || 'Current farm site status photo';
+
+  farm.siteImages.push({
+    url: photoUrl,
+    caption: caption,
+    dateUploaded: new Date()
+  });
+
+  await farm.save();
+
+  res.status(201).json({
+    success: true,
+    message: 'Farm site photo added successfully',
+    data: { farm }
+  });
+});
+
+exports.deleteFarmSitePhoto = catchAsync(async (req, res, next) => {
+  let farm = await FarmProfile.findOne({ user: req.user._id });
+  if (!farm) {
+    return next(new AppError('Farm profile not found', 404));
+  }
+
+  const photoId = req.params.photoId;
+  farm.siteImages = farm.siteImages.filter(img => img._id.toString() !== photoId);
+
+  await farm.save();
+
+  res.status(200).json({
+    success: true,
+    message: 'Farm site photo deleted successfully',
+    data: { farm }
+  });
+});

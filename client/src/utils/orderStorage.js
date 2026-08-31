@@ -2,28 +2,28 @@ export const initialDemoOrders = [
   {
     _id: 'ord101',
     orderNumber: 'FBM-882910',
-    customer: { name: 'Priya Sharma', phone: '+91 98765 43210' },
-    totalAmount: 170.00,
+    customer: { name: 'Anand Kumar', phone: '+91 98401 23456' },
+    totalAmount: 134.00,
     orderStatus: 'pending',
     paymentInfo: { method: 'upi', status: 'paid' },
     createdAt: new Date(Date.now() - 30 * 60 * 1000).toISOString(),
-    deliveryAddress: { street: 'MG Road, Flat 402', city: 'Mumbai', state: 'Maharashtra', zipCode: '400001', phone: '+91 98765 43210' },
+    deliveryAddress: { street: '12th Main Road, Anna Nagar', city: 'Chennai', state: 'Tamil Nadu', zipCode: '600040', phone: '+91 98401 23456' },
     items: [
-      { title: 'Farm Fresh Red Tomatoes (Tamatar)', quantity: 2, pricePerUnit: 20, totalPrice: 40 },
-      { title: 'Sweet Alphonso Mangoes (Aam)', quantity: 2, pricePerUnit: 65, totalPrice: 130 }
+      { title: 'Madurai Country Organic Tomatoes (மதுரை தக்காளி)', quantity: 2, pricePerUnit: 22, totalPrice: 44 },
+      { title: 'Perambalur Small Onions (சின்ன வெங்காயம்)', quantity: 2, pricePerUnit: 45, totalPrice: 90 }
     ]
   },
   {
     _id: 'ord102',
     orderNumber: 'FBM-759201',
-    customer: { name: 'Amit Patel', phone: '+91 98765 11223' },
-    totalAmount: 60.00,
+    customer: { name: 'Karthik Raja', phone: '+91 94431 88776' },
+    totalAmount: 90.00,
     orderStatus: 'harvested_packed',
     paymentInfo: { method: 'cod', status: 'pending' },
     createdAt: new Date(Date.now() - 2 * 3600 * 1000).toISOString(),
-    deliveryAddress: { street: '12 Park Street, Flat 9', city: 'Pune', state: 'Maharashtra', zipCode: '411001', phone: '+91 98765 11223' },
+    deliveryAddress: { street: '15 Cross Street, RS Puram', city: 'Coimbatore', state: 'Tamil Nadu', zipCode: '641002', phone: '+91 94431 88776' },
     items: [
-      { title: 'Free-Range Country Hen Eggs (Ande)', quantity: 1, pricePerUnit: 60, totalPrice: 60 }
+      { title: 'Chettinad Country Free-Range Eggs (செட்டிநாடு முட்டை)', quantity: 1, pricePerUnit: 90, totalPrice: 90 }
     ]
   }
 ];

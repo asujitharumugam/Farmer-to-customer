@@ -50,11 +50,11 @@ export const AuthProvider = ({ children }) => {
   const handleDemoFallbackLogin = (email, password, error) => {
     let demoUser = null;
     if (email === 'customer@gmail.com') {
-      demoUser = { _id: 'cust_demo_1', name: 'Sarah Jenkins (Demo)', email: 'customer@gmail.com', role: 'customer', phone: '+1 555 019 3344' };
+      demoUser = { _id: 'cust_demo_1', name: 'Anand Kumar (Customer)', email: 'customer@gmail.com', role: 'customer', phone: '+91 98401 23456' };
     } else if (email === 'farmer@greenacres.com') {
-      demoUser = { _id: 'farmer_demo_1', name: 'John Harvest (Demo)', email: 'farmer@greenacres.com', role: 'farmer', phone: '+1 555 014 8822' };
+      demoUser = { _id: 'farmer_demo_1', name: 'Muthusamy Gounder (Farmer)', email: 'farmer@greenacres.com', role: 'farmer', phone: '+91 94432 10987' };
     } else if (email === 'admin@farmtotable.com') {
-      demoUser = { _id: 'admin_demo_1', name: 'Platform Admin (Demo)', email: 'admin@farmtotable.com', role: 'admin', phone: '+1 800 555 0199' };
+      demoUser = { _id: 'admin_demo_1', name: 'Platform Admin (Admin)', email: 'admin@farmtotable.com', role: 'admin', phone: '+91 98765 00001' };
     }
 
     if (demoUser) {

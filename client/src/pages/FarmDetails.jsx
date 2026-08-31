@@ -73,6 +73,40 @@ const FarmDetails = () => {
           <h3 className="text-sm font-extrabold uppercase text-slate-400 tracking-wider">About Our Farm & Practices</h3>
           <p className="text-xs sm:text-sm text-slate-600 font-medium leading-relaxed">{farm.story}</p>
         </div>
+
+        {/* Real Farm Site & Current Field Photos Gallery */}
+        {farm.siteImages && farm.siteImages.length > 0 && (
+          <div className="pt-6 border-t border-slate-100 space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-xs font-black uppercase text-brand-700 tracking-wider flex items-center gap-1.5">
+                📸 Real Current Farm Site & Field Photos (Uploaded by Farmer)
+              </h3>
+              <span className="text-[11px] font-bold text-slate-400">
+                {farm.siteImages.length} Farm Updates
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+              {farm.siteImages.map((img, idx) => (
+                <div key={idx} className="group relative rounded-2xl overflow-hidden bg-slate-900 aspect-[4/3] border border-slate-200 shadow-md">
+                  <img
+                    src={img.url}
+                    alt={img.caption || 'Real Farm Site Photo'}
+                    className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/20 to-transparent p-3.5 flex flex-col justify-end">
+                    <p className="text-xs font-bold text-white line-clamp-2">
+                      {img.caption}
+                    </p>
+                    <span className="text-[10px] font-extrabold text-emerald-400 mt-1">
+                      Verified Field Visual
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Farm Produce List */}

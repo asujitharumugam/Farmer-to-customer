@@ -50,7 +50,12 @@ const farmProfileSchema = new mongoose.Schema({
   ratingCount: {
     type: Number,
     default: 12
-  }
+  },
+  siteImages: [{
+    url: { type: String, required: true },
+    caption: { type: String, default: 'Current farm site status photo' },
+    dateUploaded: { type: Date, default: Date.now }
+  }]
 }, { timestamps: true });
 
 farmProfileSchema.index({ 'location.coordinates': '2dsphere' });

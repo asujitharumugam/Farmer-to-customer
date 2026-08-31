@@ -1,19 +1,27 @@
 import React, { useState, useEffect } from 'react';
-import { Tractor, Plus, Sprout, ShoppingBag, Clock, AlertCircle, CheckCircle2, IndianRupee, Edit, Trash2, Phone, MapPin, Package, Check, XCircle, Truck } from 'lucide-react';
+import { Tractor, Plus, Sprout, ShoppingBag, Clock, AlertCircle, CheckCircle2, IndianRupee, Edit, Trash2, Phone, MapPin, Package, Check, XCircle, Truck, Camera, Upload } from 'lucide-react';
 import Badge from '../components/common/Badge';
 import AddProduceModal from '../components/farmer/AddProduceModal';
 import api from '../services/api';
 import { handleImageError } from '../utils/imageUtils';
 import { getStoredOrders, updateOrderStatusInStorage } from '../utils/orderStorage';
+import { useToast } from '../context/ToastContext';
 
 const FarmerDashboard = () => {
+  const { showToast } = useToast();
   const [farmProfile, setFarmProfile] = useState(null);
   const [products, setProducts] = useState([]);
   const [orders, setOrders] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState('orders'); // 'orders' | 'inventory'
+  const [activeTab, setActiveTab] = useState('orders'); // 'orders' | 'inventory' | 'site-photos'
+
+  // Real Farm Site Photo Upload State
+  const [sitePhotoUrl, setSitePhotoUrl] = useState('');
+  const [sitePhotoFile, setSitePhotoFile] = useState(null);
+  const [sitePhotoCaption, setSitePhotoCaption] = useState('');
+  const [uploadingSitePhoto, setUploadingSitePhoto] = useState(false);
 
   const fetchData = async () => {
     setLoading(true);
@@ -86,6 +94,67 @@ const FarmerDashboard = () => {
         stockQuantity: newStock,
         status: newStock > 0 ? 'available' : 'out_of_stock'
       } : p));
+    }
+  };
+
+  const handleUploadSitePhoto = async (e) => {
+    e.preventDefault();
+    if (!sitePhotoUrl && !sitePhotoFile) {
+      showToast('Please select an image file or enter an image URL', 'info');
+      return;
+    }
+    setUploadingSitePhoto(true);
+    try {
+      const formData = new FormData();
+      if (sitePhotoFile) formData.append('sitePhoto', sitePhotoFile);
+      if (sitePhotoUrl) formData.append('imageUrl', sitePhotoUrl);
+      formData.append('caption', sitePhotoCaption || 'Current farm site status photo');
+
+      const res = await api.post('/farmers/site-photos', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+
+      if (res.data.success && res.data.data?.farm) {
+        setFarmProfile(res.data.data.farm);
+        showToast('Real Farm Site Photo added successfully! 📸', 'success');
+        setSitePhotoUrl('');
+        setSitePhotoFile(null);
+        setSitePhotoCaption('');
+      }
+    } catch (err) {
+      const newSiteImage = {
+        _id: `temp_${Date.now()}`,
+        url: sitePhotoUrl || 'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?auto=format&fit=crop&w=800&q=80',
+        caption: sitePhotoCaption || 'Current farm site field update',
+        dateUploaded: new Date()
+      };
+      setFarmProfile(prev => ({
+        ...prev,
+        siteImages: [...(prev?.siteImages || []), newSiteImage]
+      }));
+      showToast('Farm Site Photo updated! 📸', 'success');
+      setSitePhotoUrl('');
+      setSitePhotoFile(null);
+      setSitePhotoCaption('');
+    } finally {
+      setUploadingSitePhoto(false);
+    }
+  };
+
+  const handleDeleteSitePhoto = async (photoId) => {
+    if (!window.confirm('Are you sure you want to delete this farm site photo?')) return;
+    try {
+      const res = await api.delete(`/farmers/site-photos/${photoId}`);
+      if (res.data.success && res.data.data?.farm) {
+        setFarmProfile(res.data.data.farm);
+        showToast('Farm site photo removed', 'info');
+      }
+    } catch (err) {
+      setFarmProfile(prev => ({
+        ...prev,
+        siteImages: (prev?.siteImages || []).filter(img => img._id !== photoId)
+      }));
+      showToast('Farm site photo removed', 'info');
     }
   };
 
@@ -204,6 +273,16 @@ const FarmerDashboard = () => {
           }`}
         >
           <Sprout className="w-4 h-4" /> Produce Catalog ({products.length})
+        </button>
+        <button
+          onClick={() => setActiveTab('site-photos')}
+          className={`pb-3 px-5 text-xs font-black transition-all border-b-2 flex items-center gap-2 ${
+            activeTab === 'site-photos'
+              ? 'border-brand-600 text-brand-700'
+              : 'border-transparent text-slate-500 hover:text-slate-800'
+          }`}
+        >
+          <Camera className="w-4 h-4" /> Real Farm Site Photos ({farmProfile?.siteImages?.length || 0})
         </button>
       </div>
 
@@ -407,6 +486,111 @@ const FarmerDashboard = () => {
                 })}
               </tbody>
             </table>
+          </div>
+        </div>
+      )}
+
+      {/* TAB 3: REAL FARM SITE & FIELD PHOTOS */}
+      {activeTab === 'site-photos' && (
+        <div className="space-y-8">
+          {/* Upload Form Card */}
+          <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm space-y-6">
+            <div className="space-y-1">
+              <h3 className="text-lg font-extrabold text-slate-900 flex items-center gap-2">
+                <Camera className="w-5 h-5 text-brand-600" /> Upload Real Current Farm Site Photo
+              </h3>
+              <p className="text-xs text-slate-500 font-medium">
+                Share live photos of your crops, fields, and farm operations to build customer trust and showcase produce origin.
+              </p>
+            </div>
+
+            <form onSubmit={handleUploadSitePhoto} className="grid grid-cols-1 md:grid-cols-12 gap-4">
+              <div className="md:col-span-4 space-y-1">
+                <label className="text-xs font-bold text-slate-700">Photo File Upload:</label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => setSitePhotoFile(e.target.files[0])}
+                  className="w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-extrabold file:bg-brand-50 file:text-brand-700 hover:file:bg-brand-100 border border-slate-200 rounded-xl p-1"
+                />
+              </div>
+
+              <div className="md:col-span-4 space-y-1">
+                <label className="text-xs font-bold text-slate-700">Or Image URL:</label>
+                <input
+                  type="url"
+                  placeholder="https://..."
+                  value={sitePhotoUrl}
+                  onChange={(e) => setSitePhotoUrl(e.target.value)}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs font-bold focus:bg-white focus:ring-2 focus:ring-brand-500"
+                />
+              </div>
+
+              <div className="md:col-span-4 space-y-1">
+                <label className="text-xs font-bold text-slate-700">Caption / Location Detail:</label>
+                <input
+                  type="text"
+                  placeholder="e.g., Organic Chinna Vengayam Drying Yard"
+                  value={sitePhotoCaption}
+                  onChange={(e) => setSitePhotoCaption(e.target.value)}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs font-bold focus:bg-white focus:ring-2 focus:ring-brand-500"
+                />
+              </div>
+
+              <div className="md:col-span-12 flex justify-end">
+                <button
+                  type="submit"
+                  disabled={uploadingSitePhoto}
+                  className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs px-6 py-3 rounded-xl shadow-md transition-all active:scale-95 disabled:bg-slate-300"
+                >
+                  <Upload className="w-4 h-4" /> {uploadingSitePhoto ? 'Uploading...' : 'Publish Farm Site Photo'}
+                </button>
+              </div>
+            </form>
+          </div>
+
+          {/* Site Photos Gallery Grid */}
+          <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm space-y-6">
+            <h3 className="text-base font-extrabold text-slate-900">
+              Published Farm Field Visuals ({farmProfile?.siteImages?.length || 0})
+            </h3>
+
+            {!farmProfile?.siteImages || farmProfile.siteImages.length === 0 ? (
+              <div className="text-center py-12 bg-slate-50 rounded-2xl border border-dashed border-slate-200 space-y-2">
+                <Camera className="w-10 h-10 text-slate-300 mx-auto" />
+                <p className="text-xs font-bold text-slate-600">No Farm Site Photos Uploaded Yet</p>
+                <p className="text-[11px] text-slate-400">Upload live photos of your farm above to show customers your crops in the field.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                {farmProfile.siteImages.map((img) => (
+                  <div key={img._id} className="relative group bg-slate-900 rounded-2xl overflow-hidden border border-slate-200 shadow-md aspect-[4/3]">
+                    <img
+                      src={img.url}
+                      alt={img.caption || 'Farm site photo'}
+                      onError={(e) => handleImageError(e, 'produce')}
+                      className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-transparent to-transparent p-4 flex flex-col justify-end">
+                      <p className="text-xs font-extrabold text-white line-clamp-2">
+                        {img.caption}
+                      </p>
+                      <p className="text-[10px] font-semibold text-emerald-400 mt-0.5">
+                        Uploaded: {new Date(img.dateUploaded || Date.now()).toLocaleDateString()}
+                      </p>
+                    </div>
+
+                    <button
+                      onClick={() => handleDeleteSitePhoto(img._id)}
+                      className="absolute top-3 right-3 z-10 p-2 bg-white/90 hover:bg-rose-500 hover:text-white text-rose-600 rounded-full shadow-md backdrop-blur-md transition-all"
+                      title="Delete photo"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       )}

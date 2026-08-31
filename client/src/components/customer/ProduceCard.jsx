@@ -1,12 +1,16 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Calendar, ShoppingBag, MapPin, Star } from 'lucide-react';
+import { Calendar, ShoppingBag, MapPin, Heart } from 'lucide-react';
 import Badge from '../common/Badge';
 import { useCart } from '../../context/CartContext';
+import { useWishlist } from '../../context/WishlistContext';
 import { handleImageError } from '../../utils/imageUtils';
 
 const ProduceCard = ({ product }) => {
   const { addToCart } = useCart();
+  const { isInWishlist, toggleWishlist } = useWishlist();
+
+  const isSaved = isInWishlist(product?._id);
 
   const harvestFormatted = product.harvestDate
     ? new Date(product.harvestDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
@@ -27,6 +31,24 @@ const ProduceCard = ({ product }) => {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-slate-950/40 via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity" />
         
+        {/* Wishlist Heart Toggle Button */}
+        <button
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            toggleWishlist(product);
+          }}
+          className={`absolute top-3 right-3 z-20 p-2.5 rounded-full shadow-md backdrop-blur-md transition-all active:scale-90 ${
+            isSaved
+              ? 'bg-rose-500 text-white shadow-rose-500/30'
+              : 'bg-white/80 hover:bg-white text-slate-600 hover:text-rose-500'
+          }`}
+          aria-label={isSaved ? 'Remove from wishlist' : 'Add to wishlist'}
+          title={isSaved ? 'Remove from wishlist' : 'Save to wishlist'}
+        >
+          <Heart className={`w-4 h-4 transition-transform duration-300 ${isSaved ? 'fill-white scale-110' : ''}`} />
+        </button>
+
         <div className="absolute top-3 left-3 flex flex-wrap gap-1.5 z-10">
           {product.isOrganic && <Badge variant="organic" className="shadow-sm">Organic 🌿</Badge>}
           <Badge variant="harvest" className="flex items-center gap-1 shadow-sm">

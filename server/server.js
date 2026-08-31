@@ -55,14 +55,19 @@ app.get('/api/v1/health', (req, res) => {
   });
 });
 
-// Mount Routes
-app.use('/api/v1/auth', authRoutes);
-app.use('/api/v1/users', userRoutes);
-app.use('/api/v1/farmers', farmerRoutes);
-app.use('/api/v1/products', productRoutes);
-app.use('/api/v1/orders', orderRoutes);
-app.use('/api/v1/admin', adminRoutes);
-app.use('/api/v1/reviews', reviewRoutes);
+// Mount Routes (supporting both /api/v1 and /api)
+const mountRoutes = (prefix) => {
+  app.use(`${prefix}/auth`, authRoutes);
+  app.use(`${prefix}/users`, userRoutes);
+  app.use(`${prefix}/farmers`, farmerRoutes);
+  app.use(`${prefix}/products`, productRoutes);
+  app.use(`${prefix}/orders`, orderRoutes);
+  app.use(`${prefix}/admin`, adminRoutes);
+  app.use(`${prefix}/reviews`, reviewRoutes);
+};
+
+mountRoutes('/api/v1');
+mountRoutes('/api');
 
 // 404 Route Handler
 app.all('*', (req, res) => {

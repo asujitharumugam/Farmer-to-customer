@@ -20,15 +20,15 @@ const seedData = async () => {
 
     console.log('Seeding Categories...');
     const categories = await Category.insertMany([
-      { name: 'Fresh Vegetables', slug: 'vegetables', description: 'Farm crisp, pesticide-free fresh Indian vegetables', image: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=500&q=80' },
-      { name: 'Seasonal Fruits', slug: 'fruits', description: 'Tree-ripened organic sweet Indian fruits', image: 'https://images.unsplash.com/photo-1610832958506-aa56368176cf?auto=format&fit=crop&w=500&q=80' },
-      { name: 'Grains & Pulses', slug: 'grains', description: 'Whole grain wheat, basmati rice, lentils & pulses', image: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=500&q=80' },
-      { name: 'Dairy & Farm Eggs', slug: 'dairy', description: 'Fresh cow milk, paneer, curd, ghee & free-range eggs', image: 'https://images.unsplash.com/photo-1528750997573-59b89d56f4f7?auto=format&fit=crop&w=500&q=80' },
-      { name: 'Herbs & Spices', slug: 'herbs', description: 'Aromatic mint, palak, coriander & fresh green chillies', image: 'https://images.unsplash.com/photo-1515586000433-45406d8e6662?auto=format&fit=crop&w=500&q=80' },
-      { name: 'Honey & Oils', slug: 'oils-honey', description: 'Raw forest honey, cold pressed mustard oil & organics', image: 'https://images.unsplash.com/photo-1587049352846-4a222e784d38?auto=format&fit=crop&w=500&q=80' }
+      { name: 'Fresh Vegetables', slug: 'vegetables', description: 'Farm fresh pesticide-free Tamil Nadu regional vegetables', image: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=500&q=80' },
+      { name: 'Seasonal Fruits', slug: 'fruits', description: 'Tree-ripened organic sweet Tamil Nadu fruits & coconuts', image: 'https://images.unsplash.com/photo-1610832958506-aa56368176cf?auto=format&fit=crop&w=500&q=80' },
+      { name: 'Traditional Grains & Rice', slug: 'grains', description: 'Thanjavur Ponni Rice, Karuppu Kavuni & traditional pulses', image: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=500&q=80' },
+      { name: 'Dairy & Country Eggs', slug: 'dairy', description: 'Fresh A2 cow milk, ghee & Chettinad country eggs', image: 'https://images.unsplash.com/photo-1528750997573-59b89d56f4f7?auto=format&fit=crop&w=500&q=80' },
+      { name: 'Organic Greens & Spices', slug: 'herbs', description: 'Erode Turmeric, fresh Keerai greens & Chettinad spices', image: 'https://images.unsplash.com/photo-1515586000433-45406d8e6662?auto=format&fit=crop&w=500&q=80' },
+      { name: 'Cold Pressed Oils & Honey', slug: 'oils-honey', description: 'Pollachi coconut oil, sesame oil & Western Ghats wild honey', image: 'https://images.unsplash.com/photo-1587049352846-4a222e784d38?auto=format&fit=crop&w=500&q=80' }
     ]);
 
-    console.log('Seeding Users (Customer, Farmer, Admin)...');
+    console.log('Seeding Tamil Nadu Users (Customer, Farmers, Admin)...');
     const admin = await User.create({
       name: 'Platform Admin',
       email: 'admin@farmtotable.com',
@@ -38,102 +38,390 @@ const seedData = async () => {
     });
 
     const farmer1 = await User.create({
-      name: 'Ramesh Patel',
+      name: 'Muthusamy Gounder',
       email: 'farmer@greenacres.com',
       password: 'Password123!',
       role: 'farmer',
-      phone: '+91 98765 43210',
+      phone: '+91 94432 10987',
       avatar: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=200&q=80'
     });
 
+    const farmer2 = await User.create({
+      name: 'Sundaram Ayya',
+      email: 'sundaram@deltafarms.tn',
+      password: 'Password123!',
+      role: 'farmer',
+      phone: '+91 94431 55443',
+      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80'
+    });
+
     const customer1 = await User.create({
-      name: 'Priya Sharma',
+      name: 'Anand Kumar',
       email: 'customer@gmail.com',
       password: 'Password123!',
       role: 'customer',
-      phone: '+91 98765 12345',
-      addresses: [{ street: 'MG Road, Flat 402', city: 'Mumbai', state: 'MH', zipCode: '400001', isDefault: true }]
+      phone: '+91 98401 23456',
+      addresses: [{ street: '12th Main Road, Anna Nagar', city: 'Chennai', state: 'Tamil Nadu', zipCode: '600040', isDefault: true }]
     });
 
-    console.log('Seeding Verified Farm Profile...');
+    console.log('Seeding Verified Tamil Nadu Farm Profiles with Real Farm Site Images...');
     const farmProfile1 = await FarmProfile.create({
       user: farmer1._id,
-      farmName: 'Green Acres Organic Valley',
-      story: 'Family-owned 45-acre certified organic farm operating since 1998 in Nashik. We specialize in heirloom tomatoes, fresh fruits, whole grains, and natural honey with 0% synthetic pesticides.',
-      location: { address: 'Plot 12, Farm Belt Road', city: 'Nashik', state: 'MH', zipCode: '422003' },
-      farmSizeAcres: 45,
-      verificationDocs: [{ docType: 'FSSAI Organic Accreditation', fileUrl: 'https://images.unsplash.com/photo-1595974482597-4b8da8879bc5?auto=format&fit=crop&w=800&q=80' }],
+      farmName: 'Kongu Organic Agriculture Farm',
+      story: '35-acre pesticide-free family farm located in Coimbatore/Pollachi belt, Tamil Nadu. We specialize in organic Chinna Vengayam (small onions), Madurai Country Tomatoes, Drumsticks, Pollachi Tender Coconuts, and cold-pressed coconut oil using traditional organic farming techniques.',
+      location: { address: 'Pollachi Road, Kinathukadavu', city: 'Coimbatore', state: 'Tamil Nadu', zipCode: '641109' },
+      farmSizeAcres: 35,
+      verificationDocs: [{ docType: 'Tamil Nadu Organic Certification (TNOCD)', fileUrl: 'https://images.unsplash.com/photo-1595974482597-4b8da8879bc5?auto=format&fit=crop&w=800&q=80' }],
       verificationStatus: 'approved',
       ratingAverage: 4.9,
-      ratingCount: 38
+      ratingCount: 42,
+      siteImages: [
+        { url: 'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?auto=format&fit=crop&w=800&q=80', caption: 'Kongu Organic Vegetable Patch & Irrigation Canal', dateUploaded: new Date() },
+        { url: 'https://images.unsplash.com/photo-1592417817098-8f3d6eb19655?auto=format&fit=crop&w=800&q=80', caption: 'Fresh Country Tomato Plants in Harvest Season', dateUploaded: new Date() },
+        { url: 'https://images.unsplash.com/photo-1589923188900-85dae523342b?auto=format&fit=crop&w=800&q=80', caption: 'Organic Small Onion (Chinna Vengayam) Drying Yard', dateUploaded: new Date() }
+      ]
     });
 
-    console.log('Seeding 50 Indian Produce Listings...');
+    const farmProfile2 = await FarmProfile.create({
+      user: farmer2._id,
+      farmName: 'Cauvery Delta Bio Farms',
+      story: 'Heritage 50-acre bio farm along the fertile Cauvery basin in Thanjavur, Tamil Nadu. Known for cultivating traditional Ponni Rice, Karuppu Kavuni Black Rice, fresh Erode Turmeric, and organic country eggs.',
+      location: { address: 'Papanasam Main Road', city: 'Thanjavur', state: 'Tamil Nadu', zipCode: '613001' },
+      farmSizeAcres: 50,
+      verificationDocs: [{ docType: 'TN FSSAI Bio Accreditation', fileUrl: 'https://images.unsplash.com/photo-1595974482597-4b8da8879bc5?auto=format&fit=crop&w=800&q=80' }],
+      verificationStatus: 'approved',
+      ratingAverage: 4.95,
+      ratingCount: 56,
+      siteImages: [
+        { url: 'https://images.unsplash.com/photo-1530507629858-e4977d30e9e0?auto=format&fit=crop&w=800&q=80', caption: 'Golden Cauvery Paddy Field - Thanjavur', dateUploaded: new Date() },
+        { url: 'https://images.unsplash.com/photo-1595974482597-4b8da8879bc5?auto=format&fit=crop&w=800&q=80', caption: 'Organic Farm Poultry & Free-Range Country Hen Enclosure', dateUploaded: new Date() }
+      ]
+    });
+
+    console.log('Seeding Authentic Tamil Nadu Produce Listings...');
     await Product.insertMany([
-      // === FRESH VEGETABLES (19) ===
-      { farmer: farmer1._id, farm: farmProfile1._id, title: 'Farm Fresh Red Tomatoes (Tamatar)', description: 'Naturally ripened fresh juicy red tomatoes harvested daily morning.', category: categories[0]._id, pricePerUnit: 20.00, unit: 'kg', stockQuantity: 150, harvestDate: new Date(), isOrganic: true, images: ['https://images.unsplash.com/photo-1592924357228-91a4daadcfea?auto=format&fit=crop&w=800&q=80'], status: 'available' },
-      { farmer: farmer1._id, farm: farmProfile1._id, title: 'Nashik Fresh Red Onions (Pyaz)', description: 'Crisp, flavorful organic red onions harvested fresh from the soil of Nashik.', category: categories[0]._id, pricePerUnit: 22.00, unit: 'kg', stockQuantity: 200, harvestDate: new Date(), isOrganic: true, images: ['https://images.unsplash.com/photo-1618512496248-a07fe83aa8cb?auto=format&fit=crop&w=800&q=80'], status: 'available' },
-      { farmer: farmer1._id, farm: farmProfile1._id, title: 'Organic New Crop Potatoes (Aloo)', description: 'Clean, smooth-skinned organic farm potatoes.', category: categories[0]._id, pricePerUnit: 18.00, unit: 'kg', stockQuantity: 250, harvestDate: new Date(), isOrganic: true, images: ['https://images.unsplash.com/photo-1518977676601-b53f82aba655?auto=format&fit=crop&w=800&q=80'], status: 'available' },
-      { farmer: farmer1._id, farm: farmProfile1._id, title: 'Crisp Orange Carrots (Gajar)', description: 'Sweet crunchy organic orange carrots packed with vitamin A.', category: categories[0]._id, pricePerUnit: 30.00, unit: 'kg', stockQuantity: 100, harvestDate: new Date(), isOrganic: true, images: ['https://images.unsplash.com/photo-1447175008436-054170c2e979?auto=format&fit=crop&w=800&q=80'], status: 'available' },
-      { farmer: farmer1._id, farm: farmProfile1._id, title: 'Fresh White Cauliflower (Phool Gobhi)', description: 'Farm fresh white curd cauliflower, pesticide free.', category: categories[0]._id, pricePerUnit: 25.00, unit: 'piece', stockQuantity: 80, harvestDate: new Date(), isOrganic: true, images: ['https://images.unsplash.com/photo-1568584711075-3d021a7c3ca3?auto=format&fit=crop&w=800&q=80'], status: 'available' },
-      { farmer: farmer1._id, farm: farmProfile1._id, title: 'Green Capsicum (Simla Mirch)', description: 'Vibrant green bell peppers, fresh and crunchy.', category: categories[0]._id, pricePerUnit: 35.00, unit: 'kg', stockQuantity: 90, harvestDate: new Date(), isOrganic: true, images: ['https://images.unsplash.com/photo-1563565375-f3fdfdbefa83?auto=format&fit=crop&w=800&q=80'], status: 'available' },
-      { farmer: farmer1._id, farm: farmProfile1._id, title: 'Farm Crisp Cucumbers (Kheera)', description: 'Hydrating, crisp green farm cucumbers.', category: categories[0]._id, pricePerUnit: 20.00, unit: 'kg', stockQuantity: 120, harvestDate: new Date(), isOrganic: true, images: ['https://images.unsplash.com/photo-1449300079323-02e209d9d3a6?auto=format&fit=crop&w=800&q=80'], status: 'available' },
-      { farmer: farmer1._id, farm: farmProfile1._id, title: 'Fresh Green Peas (Hari Matar)', description: 'Sweet pods filled with tender green peas.', category: categories[0]._id, pricePerUnit: 40.00, unit: 'kg', stockQuantity: 70, harvestDate: new Date(), isOrganic: true, images: ['https://images.unsplash.com/photo-1587735243615-c03f25aaff15?auto=format&fit=crop&w=800&q=80'], status: 'available' },
-      { farmer: farmer1._id, farm: farmProfile1._id, title: 'Organic Purple Brinjal (Baingan)', description: 'Glossy purple eggplants harvested fresh from fields.', category: categories[0]._id, pricePerUnit: 25.00, unit: 'kg', stockQuantity: 85, harvestDate: new Date(), isOrganic: true, images: ['https://images.unsplash.com/photo-1615485290382-441e4d049cb5?auto=format&fit=crop&w=800&q=80'], status: 'available' },
-      { farmer: farmer1._id, farm: farmProfile1._id, title: 'Tender Lady Finger (Bhindi)', description: 'Fresh tender green okra harvested daily.', category: categories[0]._id, pricePerUnit: 30.00, unit: 'kg', stockQuantity: 110, harvestDate: new Date(), isOrganic: true, images: ['https://images.unsplash.com/photo-1571680322279-a226e6a4cc2a?auto=format&fit=crop&w=800&q=80'], status: 'available' },
-      { farmer: farmer1._id, farm: farmProfile1._id, title: 'Fresh Bottle Gourd (Lauki)', description: 'Nutritious hydrating green bottle gourd.', category: categories[0]._id, pricePerUnit: 20.00, unit: 'piece', stockQuantity: 60, harvestDate: new Date(), isOrganic: true, images: ['https://images.unsplash.com/photo-1540148426945-6cf22a6b2383?auto=format&fit=crop&w=800&q=80'], status: 'available' },
-      { farmer: farmer1._id, farm: farmProfile1._id, title: 'Fresh Ridge Gourd (Torai)', description: 'Organic ridge gourd packed with dietary fiber.', category: categories[0]._id, pricePerUnit: 28.00, unit: 'kg', stockQuantity: 75, harvestDate: new Date(), isOrganic: true, images: ['https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=800&q=80'], status: 'available' },
-      { farmer: farmer1._id, farm: farmProfile1._id, title: 'Organic Bitter Gourd (Karela)', description: 'Fresh green bitter gourd, great for health and detox.', category: categories[0]._id, pricePerUnit: 32.00, unit: 'kg', stockQuantity: 65, harvestDate: new Date(), isOrganic: true, images: ['https://images.unsplash.com/photo-1597362925123-77861d3fbac7?auto=format&fit=crop&w=800&q=80'], status: 'available' },
-      { farmer: farmer1._id, farm: farmProfile1._id, title: 'Fresh Green Cabbage (Patta Gobhi)', description: 'Crisp green cabbage head washed in farm water.', category: categories[0]._id, pricePerUnit: 22.00, unit: 'piece', stockQuantity: 95, harvestDate: new Date(), isOrganic: true, images: ['https://images.unsplash.com/photo-1594282486552-05b4d80fbb9f?auto=format&fit=crop&w=800&q=80'], status: 'available' },
-      { farmer: farmer1._id, farm: farmProfile1._id, title: 'Organic Red Beetroot (Chukandar)', description: 'Rich blood-red organic beetroots, high in iron.', category: categories[0]._id, pricePerUnit: 35.00, unit: 'kg', stockQuantity: 80, harvestDate: new Date(), isOrganic: true, images: ['https://images.unsplash.com/photo-1528825871115-3581a5387919?auto=format&fit=crop&w=800&q=80'], status: 'available' },
-      { farmer: farmer1._id, farm: farmProfile1._id, title: 'Fresh Farm Radish (Mooli)', description: 'Crisp white radishes with tender green leaves.', category: categories[0]._id, pricePerUnit: 15.00, unit: 'piece', stockQuantity: 100, harvestDate: new Date(), isOrganic: true, images: ['https://images.unsplash.com/photo-1623227413711-25a05de1e5b0?auto=format&fit=crop&w=800&q=80'], status: 'available' },
-      { farmer: farmer1._id, farm: farmProfile1._id, title: 'Fresh Green Pumpkin (Kaddu)', description: 'Sweet farm pumpkin, rich in beta carotene.', category: categories[0]._id, pricePerUnit: 25.00, unit: 'kg', stockQuantity: 50, harvestDate: new Date(), isOrganic: true, images: ['https://images.unsplash.com/photo-1506917728037-b6af01a7d403?auto=format&fit=crop&w=800&q=80'], status: 'available' },
-      { farmer: farmer1._id, farm: farmProfile1._id, title: 'Farm Fresh Ginger (Adrak)', description: 'Aromatic spicy organic ginger roots.', category: categories[0]._id, pricePerUnit: 60.00, unit: 'kg', stockQuantity: 60, harvestDate: new Date(), isOrganic: true, images: ['https://images.unsplash.com/photo-1615485500704-8e990f9900f7?auto=format&fit=crop&w=800&q=80'], status: 'available' },
-      { farmer: farmer1._id, farm: farmProfile1._id, title: 'Fresh Organic Garlic (Lahsun)', description: 'Pungent white organic garlic bulbs.', category: categories[0]._id, pricePerUnit: 90.00, unit: 'kg', stockQuantity: 70, harvestDate: new Date(), isOrganic: true, images: ['https://images.unsplash.com/photo-1540148426945-6cf22a6b2383?auto=format&fit=crop&w=800&q=80'], status: 'available' },
+      // === FRESH VEGETABLES (TAMIL NADU) ===
+      {
+        farmer: farmer1._id,
+        farm: farmProfile1._id,
+        title: 'Madurai Country Organic Tomatoes (மதுரை தக்காளி)',
+        description: 'Juicy, rich sour-sweet country tomatoes harvested fresh from Madurai / Pollachi fields. 100% organic without chemicals.',
+        category: categories[0]._id,
+        pricePerUnit: 22.00,
+        unit: 'kg',
+        stockQuantity: 180,
+        harvestDate: new Date(),
+        isOrganic: true,
+        images: ['https://images.unsplash.com/photo-1592924357228-91a4daadcfea?auto=format&fit=crop&w=800&q=80'],
+        status: 'available'
+      },
+      {
+        farmer: farmer1._id,
+        farm: farmProfile1._id,
+        title: 'Perambalur Small Onions / Chinna Vengayam (சின்ன வெங்காயம்)',
+        description: 'Pungent, highly aromatic authentic Tamil Nadu small shallot onions (Chinna Vengayam), essential for Sambar and Rasam.',
+        category: categories[0]._id,
+        pricePerUnit: 45.00,
+        unit: 'kg',
+        stockQuantity: 220,
+        harvestDate: new Date(),
+        isOrganic: true,
+        images: ['https://images.unsplash.com/photo-1618512496248-a07fe83aa8cb?auto=format&fit=crop&w=800&q=80'],
+        status: 'available'
+      },
+      {
+        farmer: farmer1._id,
+        farm: farmProfile1._id,
+        title: 'Theni Fresh Organic Murungakkai / Drumstick (முருங்கைக்காய்)',
+        description: 'Tender long green drumsticks grown naturally in Theni & Dindigul region. Loaded with iron and natural fiber.',
+        category: categories[0]._id,
+        pricePerUnit: 38.00,
+        unit: 'kg',
+        stockQuantity: 120,
+        harvestDate: new Date(),
+        isOrganic: true,
+        images: ['https://images.unsplash.com/photo-1571680322279-a226e6a4cc2a?auto=format&fit=crop&w=800&q=80'],
+        status: 'available'
+      },
+      {
+        farmer: farmer1._id,
+        farm: farmProfile1._id,
+        title: 'Tirunelveli Green Kathirikai / Brinjal (கத்திரிக்காய்)',
+        description: 'Crisp, glossy green striped country eggplants perfect for Ennai Kathirikai Vathal and Kara Kuzhambu.',
+        category: categories[0]._id,
+        pricePerUnit: 28.00,
+        unit: 'kg',
+        stockQuantity: 140,
+        harvestDate: new Date(),
+        isOrganic: true,
+        images: ['https://images.unsplash.com/photo-1615485290382-441e4d049cb5?auto=format&fit=crop&w=800&q=80'],
+        status: 'available'
+      },
+      {
+        farmer: farmer2._id,
+        farm: farmProfile2._id,
+        title: 'Ooty Hillside Organic Carrots (ஊட்டி கேரட்)',
+        description: 'Sweet, crunchy, deep orange carrots harvested straight from the cool Nilgiris hill terraces.',
+        category: categories[0]._id,
+        pricePerUnit: 40.00,
+        unit: 'kg',
+        stockQuantity: 160,
+        harvestDate: new Date(),
+        isOrganic: true,
+        images: ['https://images.unsplash.com/photo-1447175008436-054170c2e979?auto=format&fit=crop&w=800&q=80'],
+        status: 'available'
+      },
+      {
+        farmer: farmer2._id,
+        farm: farmProfile2._id,
+        title: 'Nilgiris Fresh Farm Potatoes (நீலகிரி உருளைக்கிழங்கு)',
+        description: 'Smooth, golden mountain potatoes cultivated organically in high altitude Nilgiris soil.',
+        category: categories[0]._id,
+        pricePerUnit: 32.00,
+        unit: 'kg',
+        stockQuantity: 200,
+        harvestDate: new Date(),
+        isOrganic: true,
+        images: ['https://images.unsplash.com/photo-1518977676601-b53f82aba655?auto=format&fit=crop&w=800&q=80'],
+        status: 'available'
+      },
+      {
+        farmer: farmer1._id,
+        farm: farmProfile1._id,
+        title: 'Fresh Organic Vendakkai / Okra (வெண்டைக்காய்)',
+        description: 'Tender young green ladies finger, crisp and pesticide-free, harvested daily morning.',
+        category: categories[0]._id,
+        pricePerUnit: 30.00,
+        unit: 'kg',
+        stockQuantity: 110,
+        harvestDate: new Date(),
+        isOrganic: true,
+        images: ['https://images.unsplash.com/photo-1571680322279-a226e6a4cc2a?auto=format&fit=crop&w=800&q=80'],
+        status: 'available'
+      },
+      {
+        farmer: farmer1._id,
+        farm: farmProfile1._id,
+        title: 'Fresh Farm Vazhaipoo / Banana Flower (வாழைப்பூ)',
+        description: 'Nutritious fresh organic banana flower, cleaned and packed direct from Tamil Nadu plantain groves.',
+        category: categories[0]._id,
+        pricePerUnit: 25.00,
+        unit: 'piece',
+        stockQuantity: 70,
+        harvestDate: new Date(),
+        isOrganic: true,
+        images: ['https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=800&q=80'],
+        status: 'available'
+      },
+      {
+        farmer: farmer1._id,
+        farm: farmProfile1._id,
+        title: 'Fresh Organic Surakai / Bottle Gourd (சுரைக்காய்)',
+        description: 'Hydrating, sweet green organic bottle gourd, perfect for healthy juices and Poriyal.',
+        category: categories[0]._id,
+        pricePerUnit: 24.00,
+        unit: 'piece',
+        stockQuantity: 85,
+        harvestDate: new Date(),
+        isOrganic: true,
+        images: ['https://images.unsplash.com/photo-1540148426945-6cf22a6b2383?auto=format&fit=crop&w=800&q=80'],
+        status: 'available'
+      },
+      {
+        farmer: farmer1._id,
+        farm: farmProfile1._id,
+        title: 'Fresh Peerkangai / Ridge Gourd (பீர்க்கங்காய்)',
+        description: 'Crisp green ridge gourd, rich in minerals and dietary fiber.',
+        category: categories[0]._id,
+        pricePerUnit: 30.00,
+        unit: 'kg',
+        stockQuantity: 90,
+        harvestDate: new Date(),
+        isOrganic: true,
+        images: ['https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=800&q=80'],
+        status: 'available'
+      },
+      {
+        farmer: farmer1._id,
+        farm: farmProfile1._id,
+        title: 'Organic Pavakkai / Bitter Gourd (பாகற்காய்)',
+        description: 'Dark green firm bitter gourds, excellent for blood sugar management and traditional Vathal.',
+        category: categories[0]._id,
+        pricePerUnit: 35.00,
+        unit: 'kg',
+        stockQuantity: 75,
+        harvestDate: new Date(),
+        isOrganic: true,
+        images: ['https://images.unsplash.com/photo-1597362925123-77861d3fbac7?auto=format&fit=crop&w=800&q=80'],
+        status: 'available'
+      },
+      {
+        farmer: farmer1._id,
+        farm: farmProfile1._id,
+        title: 'Dindigul Spicy Green Chillies (பச்சை மிளகாய்)',
+        description: 'Fiery, fresh green chillies direct from Dindigul vegetable farms.',
+        category: categories[0]._id,
+        pricePerUnit: 30.00,
+        unit: 'kg',
+        stockQuantity: 100,
+        harvestDate: new Date(),
+        isOrganic: true,
+        images: ['https://images.unsplash.com/photo-1536304993881-ff6e9eefa2a6?auto=format&fit=crop&w=800&q=80'],
+        status: 'available'
+      },
 
-      // === SEASONAL FRUITS (12) ===
-      { farmer: farmer1._id, farm: farmProfile1._id, title: 'Sweet Alphonso Mangoes (Aam)', description: 'Tree-ripened organic sweet Alphonso mangoes with rich golden pulp.', category: categories[1]._id, pricePerUnit: 65.00, unit: 'kg', stockQuantity: 80, harvestDate: new Date(), isOrganic: true, images: ['https://images.unsplash.com/photo-1553279768-865429fa0078?auto=format&fit=crop&w=800&q=80'], status: 'available' },
-      { farmer: farmer1._id, farm: farmProfile1._id, title: 'Kashmiri Red Apples (Seb)', description: 'Crisp sweet red apples direct from orchards.', category: categories[1]._id, pricePerUnit: 75.00, unit: 'kg', stockQuantity: 100, harvestDate: new Date(), isOrganic: true, images: ['https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?auto=format&fit=crop&w=800&q=80'], status: 'available' },
-      { farmer: farmer1._id, farm: farmProfile1._id, title: 'Ripe Golden Bananas (Kela)', description: 'Naturally ripened sweet yellow bananas.', category: categories[1]._id, pricePerUnit: 35.00, unit: 'dozen', stockQuantity: 150, harvestDate: new Date(), isOrganic: true, images: ['https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?auto=format&fit=crop&w=800&q=80'], status: 'available' },
-      { farmer: farmer1._id, farm: farmProfile1._id, title: 'Sweet Nagpur Oranges (Santra)', description: 'Juicy sweet oranges packed with vitamin C.', category: categories[1]._id, pricePerUnit: 45.00, unit: 'kg', stockQuantity: 120, harvestDate: new Date(), isOrganic: true, images: ['https://images.unsplash.com/photo-1611080626919-7cf5a9dbab5b?auto=format&fit=crop&w=800&q=80'], status: 'available' },
-      { farmer: farmer1._id, farm: farmProfile1._id, title: 'Fresh Ruby Pomegranates (Anaar)', description: 'Juicy red pomegranates loaded with antioxidants.', category: categories[1]._id, pricePerUnit: 85.00, unit: 'kg', stockQuantity: 60, harvestDate: new Date(), isOrganic: true, images: ['https://images.unsplash.com/photo-1565271921421-5fb5f18d3e79?auto=format&fit=crop&w=800&q=80'], status: 'available' },
-      { farmer: farmer1._id, farm: farmProfile1._id, title: 'Farm Fresh Green Guava (Amrood)', description: 'Crisp green guava with sweet pink pulp.', category: categories[1]._id, pricePerUnit: 30.00, unit: 'kg', stockQuantity: 90, harvestDate: new Date(), isOrganic: true, images: ['https://images.unsplash.com/photo-1536511157201-5222b3a985d7?auto=format&fit=crop&w=800&q=80'], status: 'available' },
-      { farmer: farmer1._id, farm: farmProfile1._id, title: 'Sweet Red Watermelon (Tarbooz)', description: 'Cool and refreshing red watermelon.', category: categories[1]._id, pricePerUnit: 25.00, unit: 'piece', stockQuantity: 40, harvestDate: new Date(), isOrganic: true, images: ['https://images.unsplash.com/photo-1563114773-84221bd62daa?auto=format&fit=crop&w=800&q=80'], status: 'available' },
-      { farmer: farmer1._id, farm: farmProfile1._id, title: 'Ripe Yellow Papaya (Papita)', description: 'Sweet papaya great for digestion.', category: categories[1]._id, pricePerUnit: 30.00, unit: 'kg', stockQuantity: 70, harvestDate: new Date(), isOrganic: true, images: ['https://images.unsplash.com/photo-1617112848923-cc2234396a8d?auto=format&fit=crop&w=800&q=80'], status: 'available' },
-      { farmer: farmer1._id, farm: farmProfile1._id, title: 'Sweet Muskmelon (Kharbooja)', description: 'Aromatic sweet muskmelon.', category: categories[1]._id, pricePerUnit: 35.00, unit: 'kg', stockQuantity: 55, harvestDate: new Date(), isOrganic: true, images: ['https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?auto=format&fit=crop&w=800&q=80'], status: 'available' },
-      { farmer: farmer1._id, farm: farmProfile1._id, title: 'Fresh Green Grapes (Angoor)', description: 'Seedless sweet green grapes.', category: categories[1]._id, pricePerUnit: 50.00, unit: 'kg', stockQuantity: 80, harvestDate: new Date(), isOrganic: true, images: ['https://images.unsplash.com/photo-1537640538966-79f369143f8f?auto=format&fit=crop&w=800&q=80'], status: 'available' },
-      { farmer: farmer1._id, farm: farmProfile1._id, title: 'Sweet Chikoo (Sapota)', description: 'Brown sweet chikoo with rich caramel flavor.', category: categories[1]._id, pricePerUnit: 40.00, unit: 'kg', stockQuantity: 65, harvestDate: new Date(), isOrganic: true, images: ['https://images.unsplash.com/photo-1610832958506-aa56368176cf?auto=format&fit=crop&w=800&q=80'], status: 'available' },
-      { farmer: farmer1._id, farm: farmProfile1._id, title: 'Fresh Sweet Lime (Mosambi)', description: 'Juicy citrus sweet lime for fresh juice.', category: categories[1]._id, pricePerUnit: 45.00, unit: 'kg', stockQuantity: 75, harvestDate: new Date(), isOrganic: true, images: ['https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=800&q=80'], status: 'available' },
+      // === SEASONAL FRUITS ===
+      {
+        farmer: farmer1._id,
+        farm: farmProfile1._id,
+        title: 'Salem Malgova & Alphonso Mangoes (சேலம் மாம்பழம்)',
+        description: 'World-famous Salem organic Malgova mangoes, tree-ripened with irresistible natural sweetness.',
+        category: categories[1]._id,
+        pricePerUnit: 120.00,
+        unit: 'kg',
+        stockQuantity: 95,
+        harvestDate: new Date(),
+        isOrganic: true,
+        images: ['https://images.unsplash.com/photo-1553279768-865429fa0078?auto=format&fit=crop&w=800&q=80'],
+        status: 'available'
+      },
+      {
+        farmer: farmer1._id,
+        farm: farmProfile1._id,
+        title: 'Pollachi Fresh Tender Coconut (பொள்ளாச்சி இளநீர்)',
+        description: 'Sweet, natural electrolyte-packed tender coconut with rich water content straight from Pollachi groves.',
+        category: categories[1]._id,
+        pricePerUnit: 35.00,
+        unit: 'piece',
+        stockQuantity: 250,
+        harvestDate: new Date(),
+        isOrganic: true,
+        images: ['https://images.unsplash.com/photo-1525257831700-18389ad16575?auto=format&fit=crop&w=800&q=80'],
+        status: 'available'
+      },
+      {
+        farmer: farmer1._id,
+        farm: farmProfile1._id,
+        title: 'Kanyakumari Nendran Organic Bananas (நேந்திரன் பழம்)',
+        description: 'Sweet golden Nendran bananas cultivated organically along Kanyakumari coastal belt.',
+        category: categories[1]._id,
+        pricePerUnit: 50.00,
+        unit: 'dozen',
+        stockQuantity: 130,
+        harvestDate: new Date(),
+        isOrganic: true,
+        images: ['https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?auto=format&fit=crop&w=800&q=80'],
+        status: 'available'
+      },
 
-      // === GRAINS & PULSES (7) ===
-      { farmer: farmer1._id, farm: farmProfile1._id, title: 'Aromatic Basmati Rice (Chawal)', description: 'Aromatic long-grain organic Basmati rice naturally aged.', category: categories[2]._id, pricePerUnit: 55.00, unit: 'kg', stockQuantity: 300, harvestDate: new Date(), isOrganic: true, images: ['https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=800&q=80'], status: 'available' },
-      { farmer: farmer1._id, farm: farmProfile1._id, title: 'Organic Whole Wheat Flour (Atta)', description: 'Stone-ground whole wheat flour.', category: categories[2]._id, pricePerUnit: 32.00, unit: 'kg', stockQuantity: 250, harvestDate: new Date(), isOrganic: true, images: ['https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?auto=format&fit=crop&w=800&q=80'], status: 'available' },
-      { farmer: farmer1._id, farm: farmProfile1._id, title: 'Yellow Toor Dal (Arhar Dal)', description: 'Protein-rich polished yellow lentils.', category: categories[2]._id, pricePerUnit: 85.00, unit: 'kg', stockQuantity: 180, harvestDate: new Date(), isOrganic: true, images: ['https://images.unsplash.com/photo-1612257416648-b9c37e59b7e9?auto=format&fit=crop&w=800&q=80'], status: 'available' },
-      { farmer: farmer1._id, farm: farmProfile1._id, title: 'Organic Chana Dal (Bengal Gram)', description: 'High protein split Bengal gram pulses.', category: categories[2]._id, pricePerUnit: 70.00, unit: 'kg', stockQuantity: 160, harvestDate: new Date(), isOrganic: true, images: ['https://images.unsplash.com/photo-1603048297172-c92544798d5b?auto=format&fit=crop&w=800&q=80'], status: 'available' },
-      { farmer: farmer1._id, farm: farmProfile1._id, title: 'Green Moong Dal Whole', description: 'Organic green gram pulses.', category: categories[2]._id, pricePerUnit: 75.00, unit: 'kg', stockQuantity: 140, harvestDate: new Date(), isOrganic: true, images: ['https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=800&q=80'], status: 'available' },
-      { farmer: farmer1._id, farm: farmProfile1._id, title: 'Organic Rajma (Red Kidney Beans)', description: 'Premium Jammu organic red kidney beans.', category: categories[2]._id, pricePerUnit: 90.00, unit: 'kg', stockQuantity: 120, harvestDate: new Date(), isOrganic: true, images: ['https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80'], status: 'available' },
-      { farmer: farmer1._id, farm: farmProfile1._id, title: 'Kabuli Chana (White Chickpeas)', description: 'Large white chickpeas, perfect for Chole.', category: categories[2]._id, pricePerUnit: 85.00, unit: 'kg', stockQuantity: 130, harvestDate: new Date(), isOrganic: true, images: ['https://images.unsplash.com/photo-1594282486552-05b4d80fbb9f?auto=format&fit=crop&w=800&q=80'], status: 'available' },
+      // === TRADITIONAL GRAINS & RICE ===
+      {
+        farmer: farmer2._id,
+        farm: farmProfile2._id,
+        title: 'Thanjavur Deluxe Ponni Boiled Rice (தஞ்சாவூர் பொன்னி அரிசி)',
+        description: 'Premium aged Thanjavur Cauvery delta Ponni rice, fluffy and nutritious for daily meals.',
+        category: categories[2]._id,
+        pricePerUnit: 62.00,
+        unit: 'kg',
+        stockQuantity: 400,
+        harvestDate: new Date(),
+        isOrganic: true,
+        images: ['https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=800&q=80'],
+        status: 'available'
+      },
+      {
+        farmer: farmer2._id,
+        farm: farmProfile2._id,
+        title: 'Karuppu Kavuni Traditional Black Rice (கருப்பு கவுனி அரிசி)',
+        description: 'Ancient royal Tamil Nadu heritage black rice, immensely rich in anthocyanin antioxidants and minerals.',
+        category: categories[2]._id,
+        pricePerUnit: 140.00,
+        unit: 'kg',
+        stockQuantity: 150,
+        harvestDate: new Date(),
+        isOrganic: true,
+        images: ['https://images.unsplash.com/photo-1603048297172-c92544798d5b?auto=format&fit=crop&w=800&q=80'],
+        status: 'available'
+      },
 
-      // === DAIRY & FARM EGGS (6) ===
-      { farmer: farmer1._id, farm: farmProfile1._id, title: 'Pure Dairy Cow Milk (Doodh)', description: 'Fresh pure organic whole milk delivered daily.', category: categories[3]._id, pricePerUnit: 30.00, unit: 'litre', stockQuantity: 100, harvestDate: new Date(), isOrganic: true, images: ['https://images.unsplash.com/photo-1563636619-e9143da7973b?auto=format&fit=crop&w=800&q=80'], status: 'available' },
-      { farmer: farmer1._id, farm: farmProfile1._id, title: 'Fresh Farm Paneer (Cottage Cheese)', description: 'Soft artisanal fresh farm paneer.', category: categories[3]._id, pricePerUnit: 80.00, unit: 'box', stockQuantity: 50, harvestDate: new Date(), isOrganic: true, images: ['https://images.unsplash.com/photo-1631452180519-c014fe946bc7?auto=format&fit=crop&w=800&q=80'], status: 'available' },
-      { farmer: farmer1._id, farm: farmProfile1._id, title: 'Pure Country Cow Ghee (Shuddh Ghee)', description: 'Traditional bilona method pure cow ghee.', category: categories[3]._id, pricePerUnit: 250.00, unit: 'piece', stockQuantity: 40, harvestDate: new Date(), isOrganic: true, images: ['https://images.unsplash.com/photo-1589985270826-4b7bb135bc9d?auto=format&fit=crop&w=800&q=80'], status: 'available' },
-      { farmer: farmer1._id, farm: farmProfile1._id, title: 'Fresh Farm Thick Curd (Dahi)', description: 'Natural thick clay-pot curd.', category: categories[3]._id, pricePerUnit: 35.00, unit: 'piece', stockQuantity: 60, harvestDate: new Date(), isOrganic: true, images: ['https://images.unsplash.com/photo-1488477181946-6428a0291777?auto=format&fit=crop&w=800&q=80'], status: 'available' },
-      { farmer: farmer1._id, farm: farmProfile1._id, title: 'Free-Range Country Hen Eggs (Ande)', description: 'Organic free-range brown eggs.', category: categories[3]._id, pricePerUnit: 60.00, unit: 'dozen', stockQuantity: 80, harvestDate: new Date(), isOrganic: true, images: ['https://images.unsplash.com/photo-1508739773434-c26b3d09e071?auto=format&fit=crop&w=800&q=80'], status: 'available' },
-      { farmer: farmer1._id, farm: farmProfile1._id, title: 'Fresh Butter Milk (Chaach)', description: 'Refreshing spiced farm buttermilk.', category: categories[3]._id, pricePerUnit: 20.00, unit: 'litre', stockQuantity: 90, harvestDate: new Date(), isOrganic: true, images: ['https://images.unsplash.com/photo-1550583724-b2692b85b150?auto=format&fit=crop&w=800&q=80'], status: 'available' },
+      // === DAIRY & EGGS ===
+      {
+        farmer: farmer2._id,
+        farm: farmProfile2._id,
+        title: 'Chettinad Country Free-Range Eggs (செட்டிநாடு நாட்டுக்கோழி முட்டை)',
+        description: 'Natural free-range country hen eggs with rich golden yolk from Chettinad organic bio farm.',
+        category: categories[3]._id,
+        pricePerUnit: 90.00,
+        unit: 'dozen',
+        stockQuantity: 120,
+        harvestDate: new Date(),
+        isOrganic: true,
+        images: ['https://images.unsplash.com/photo-1508739773434-c26b3d09e071?auto=format&fit=crop&w=800&q=80'],
+        status: 'available'
+      },
 
-      // === HERBS & SPICES (4) ===
-      { farmer: farmer1._id, farm: farmProfile1._id, title: 'Fresh Organic Palak (Spinach)', description: 'Crisp green spinach washed in natural farm water.', category: categories[4]._id, pricePerUnit: 12.00, unit: 'piece', stockQuantity: 100, harvestDate: new Date(), isOrganic: true, images: ['https://images.unsplash.com/photo-1576045057995-568f588f82fb?auto=format&fit=crop&w=800&q=80'], status: 'available' },
-      { farmer: farmer1._id, farm: farmProfile1._id, title: 'Fresh Green Coriander (Hara Dhaniya)', description: 'Aromatic green coriander leaves.', category: categories[4]._id, pricePerUnit: 10.00, unit: 'piece', stockQuantity: 150, harvestDate: new Date(), isOrganic: true, images: ['https://images.unsplash.com/photo-1588879460418-7247754f9408?auto=format&fit=crop&w=800&q=80'], status: 'available' },
-      { farmer: farmer1._id, farm: farmProfile1._id, title: 'Fresh Aromatic Mint Leaves (Pudina)', description: 'Fragrant mint leaves harvested daily.', category: categories[4]._id, pricePerUnit: 10.00, unit: 'piece', stockQuantity: 120, harvestDate: new Date(), isOrganic: true, images: ['https://images.unsplash.com/photo-1515586000433-45406d8e6662?auto=format&fit=crop&w=800&q=80'], status: 'available' },
-      { farmer: farmer1._id, farm: farmProfile1._id, title: 'Spicy Fresh Green Chillies (Hari Mirch)', description: 'Fiery green chillies direct from farm.', category: categories[4]._id, pricePerUnit: 15.00, unit: 'gram', stockQuantity: 100, harvestDate: new Date(), isOrganic: true, images: ['https://images.unsplash.com/photo-1536304993881-ff6e9eefa2a6?auto=format&fit=crop&w=800&q=80'], status: 'available' },
+      // === ORGANIC GREENS & SPICES ===
+      {
+        farmer: farmer2._id,
+        farm: farmProfile2._id,
+        title: 'Erode Pure Organic Turmeric Powder / Manjal (ஈரோடு மஞ்சள்)',
+        description: 'High curcumin natural vibrant yellow turmeric cultivated in Erode district.',
+        category: categories[4]._id,
+        pricePerUnit: 110.00,
+        unit: 'kg',
+        stockQuantity: 180,
+        harvestDate: new Date(),
+        isOrganic: true,
+        images: ['https://images.unsplash.com/photo-1615485500704-8e990f9900f7?auto=format&fit=crop&w=800&q=80'],
+        status: 'available'
+      },
+      {
+        farmer: farmer1._id,
+        farm: farmProfile1._id,
+        title: 'Fresh Manathakkali & Arai Keerai (மணத்தக்காளி கீரை)',
+        description: 'Freshly plucked organic Tamil greens (Keerai), rich in iron and traditional healing properties.',
+        category: categories[4]._id,
+        pricePerUnit: 15.00,
+        unit: 'piece',
+        stockQuantity: 150,
+        harvestDate: new Date(),
+        isOrganic: true,
+        images: ['https://images.unsplash.com/photo-1576045057995-568f588f82fb?auto=format&fit=crop&w=800&q=80'],
+        status: 'available'
+      },
 
-      // === NATURAL HONEY & OILS (2) ===
-      { farmer: farmer1._id, farm: farmProfile1._id, title: 'Wild Forest Raw Honey (Madhu)', description: 'Unfiltered raw wildflower honey collected directly from farm apiaries.', category: categories[5]._id, pricePerUnit: 120.00, unit: 'piece', stockQuantity: 40, harvestDate: new Date(), isOrganic: true, images: ['https://images.unsplash.com/photo-1471943038886-b9a3f02dde73?auto=format&fit=crop&w=800&q=80'], status: 'available' },
-      { farmer: farmer1._id, farm: farmProfile1._id, title: 'Cold Pressed Mustard Oil (Sarson Tel)', description: 'Pure unrefined cold-pressed mustard oil.', category: categories[5]._id, pricePerUnit: 110.00, unit: 'litre', stockQuantity: 80, harvestDate: new Date(), isOrganic: true, images: ['https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?auto=format&fit=crop&w=800&q=80'], status: 'available' }
+      // === COLD PRESSED OILS & HONEY ===
+      {
+        farmer: farmer1._id,
+        farm: farmProfile1._id,
+        title: 'Pollachi Cold Pressed Wood-Chekku Coconut Oil (தேங்காய் எண்ணெய்)',
+        description: '100% pure cold pressed unrefined coconut oil extracted from sundried Pollachi copra.',
+        category: categories[5]._id,
+        pricePerUnit: 210.00,
+        unit: 'litre',
+        stockQuantity: 100,
+        harvestDate: new Date(),
+        isOrganic: true,
+        images: ['https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?auto=format&fit=crop&w=800&q=80'],
+        status: 'available'
+      },
+      {
+        farmer: farmer2._id,
+        farm: farmProfile2._id,
+        title: 'Western Ghats Palani Wild Forest Honey (இயற்கை தேன்)',
+        description: 'Raw unpasteurized wild honey collected sustainably from deep mountain forests near Palani.',
+        category: categories[5]._id,
+        pricePerUnit: 180.00,
+        unit: 'piece',
+        stockQuantity: 80,
+        harvestDate: new Date(),
+        isOrganic: true,
+        images: ['https://images.unsplash.com/photo-1471943038886-b9a3f02dde73?auto=format&fit=crop&w=800&q=80'],
+        status: 'available'
+      }
     ]);
 
-    console.log('Database Seeding Completed Successfully! 🌱');
+    console.log('Tamil Nadu Database Seeding Completed Successfully! 🌾');
     process.exit(0);
   } catch (err) {
     console.error('Database Seeding Error:', err);
