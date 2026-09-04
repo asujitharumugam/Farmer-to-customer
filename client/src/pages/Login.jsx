@@ -43,12 +43,12 @@ const Login = () => {
     if (res?.success) {
       if (res.user.role === 'farmer') navigate('/farmer/dashboard');
       else if (res.user.role === 'admin') navigate('/admin/dashboard');
-      else navigate('/shop');
+      else navigate('/home');
     } else {
       switchRoleDemo(activeRole);
       if (activeRole === 'farmer') navigate('/farmer/dashboard');
       else if (activeRole === 'admin') navigate('/admin/dashboard');
-      else navigate('/shop');
+      else navigate('/home');
     }
   };
 

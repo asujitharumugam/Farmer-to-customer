@@ -24,7 +24,7 @@ import FarmerDashboard from '../pages/FarmerDashboard';
 import FarmerOnboarding from '../pages/FarmerOnboarding';
 import AdminDashboard from '../pages/AdminDashboard';
 
-// Protected Route Guard
+// Protected Route Guard (for pages requiring login)
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { user, loading } = useAuth();
 
@@ -43,26 +43,123 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
   return children;
 };
 
+// Public Only Guard (for Login & Register pages when already authenticated)
+const PublicOnlyRoute = ({ children }) => {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return <div className="p-12 text-center text-xs font-bold text-slate-400">Loading platform credentials...</div>;
+  }
+
+  if (user) {
+    if (user.role === 'farmer') return <Navigate to="/farmer/dashboard" replace />;
+    if (user.role === 'admin') return <Navigate to="/admin/dashboard" replace />;
+    return <Navigate to="/home" replace />;
+  }
+
+  return children;
+};
+
+// Root Route Handler: Redirects to /login if unauthenticated, or to the main interface if authenticated
+const RootRoute = () => {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return <div className="p-12 text-center text-xs font-bold text-slate-400">Loading platform credentials...</div>;
+  }
+
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (user.role === 'farmer') return <Navigate to="/farmer/dashboard" replace />;
+  if (user.role === 'admin') return <Navigate to="/admin/dashboard" replace />;
+  return <Navigate to="/home" replace />;
+};
+
 const AppRoutes = () => {
   return (
     <Routes>
-      {/* Public Pages */}
-      <Route path="/" element={<LandingPage />} />
-      <Route path="/home" element={<Home />} />
-      <Route path="/shop" element={<Shop />} />
-      <Route path="/produce/:id" element={<ProduceDetails />} />
-      <Route path="/farmer/public/:id" element={<FarmDetails />} />
-      <Route path="/about" element={<AboutPage />} />
-      <Route path="/contact" element={<ContactPage />} />
-      <Route path="/cart" element={<CartPage />} />
+      {/* Root Route: Requires Login First */}
+      <Route path="/" element={<RootRoute />} />
 
-      {/* Auth Pages */}
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
+      {/* Auth Pages (accessible only when not logged in) */}
+      <Route
+        path="/login"
+        element={
+          <PublicOnlyRoute>
+            <Login />
+          </PublicOnlyRoute>
+        }
+      />
+      <Route
+        path="/register"
+        element={
+          <PublicOnlyRoute>
+            <Register />
+          </PublicOnlyRoute>
+        }
+      />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password/:token" element={<ResetPassword />} />
 
-      {/* Protected Customer Routes */}
+      {/* Protected Website Interface Pages (Requires Login) */}
+      <Route
+        path="/home"
+        element={
+          <ProtectedRoute>
+            <Home />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/shop"
+        element={
+          <ProtectedRoute>
+            <Shop />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/produce/:id"
+        element={
+          <ProtectedRoute>
+            <ProduceDetails />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/farmer/public/:id"
+        element={
+          <ProtectedRoute>
+            <FarmDetails />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/about"
+        element={
+          <ProtectedRoute>
+            <AboutPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/contact"
+        element={
+          <ProtectedRoute>
+            <ContactPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/cart"
+        element={
+          <ProtectedRoute>
+            <CartPage />
+          </ProtectedRoute>
+        }
+      />
       <Route
         path="/checkout"
         element={

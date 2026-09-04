@@ -64,6 +64,15 @@ const seedData = async () => {
       addresses: [{ street: '12th Main Road, Anna Nagar', city: 'Chennai', state: 'Tamil Nadu', zipCode: '600040', isDefault: true }]
     });
 
+    const farmer3 = await User.create({
+      name: 'Ramasamy Gounder',
+      email: 'farmer3@konguhydro.tn',
+      password: 'Password123!',
+      role: 'farmer',
+      phone: '+91 94421 88990',
+      avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=200&q=80'
+    });
+
     console.log('Seeding Verified Tamil Nadu Farm Profiles with Real Farm Site Images...');
     const farmProfile1 = await FarmProfile.create({
       user: farmer1._id,
@@ -96,6 +105,18 @@ const seedData = async () => {
         { url: 'https://images.unsplash.com/photo-1530507629858-e4977d30e9e0?auto=format&fit=crop&w=800&q=80', caption: 'Golden Cauvery Paddy Field - Thanjavur', dateUploaded: new Date() },
         { url: 'https://images.unsplash.com/photo-1595974482597-4b8da8879bc5?auto=format&fit=crop&w=800&q=80', caption: 'Organic Farm Poultry & Free-Range Country Hen Enclosure', dateUploaded: new Date() }
       ]
+    });
+
+    const farmProfile3 = await FarmProfile.create({
+      user: farmer3._id,
+      farmName: 'Kongu Hydroponics & Bio Farm',
+      story: 'Advanced 12-acre hydroponics and organic microgreens unit based near Coimbatore, Tamil Nadu.',
+      location: { address: '88 Pollachi Main Road', city: 'Coimbatore', state: 'Tamil Nadu', zipCode: '641001' },
+      farmSizeAcres: 12,
+      verificationDocs: [{ docType: 'Tamil Nadu Organic Certification (TNOCD)', fileUrl: 'https://images.unsplash.com/photo-1595974482597-4b8da8879bc5?auto=format&fit=crop&w=800&q=80' }],
+      verificationStatus: 'pending',
+      ratingAverage: 0,
+      ratingCount: 0
     });
 
     console.log('Seeding Authentic Tamil Nadu Produce Listings...');

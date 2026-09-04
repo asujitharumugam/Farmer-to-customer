@@ -70,6 +70,16 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleVerificationAction = (farmId, status) => {
+    setPendingFarms(prev => prev.filter(f => f._id !== farmId));
+    setStats(prev => prev ? {
+      ...prev,
+      pendingVerifications: Math.max(0, (prev.pendingVerifications || 1) - 1),
+      totalFarmers: status === 'approved' ? (prev.totalFarmers || 0) + 1 : prev.totalFarmers
+    } : prev);
+    fetchData();
+  };
+
   if (loading) {
     return <div className="max-w-7xl mx-auto px-4 py-16"><div className="h-96 bg-slate-200 rounded-3xl animate-pulse" /></div>;
   }
@@ -108,7 +118,7 @@ const AdminDashboard = () => {
         />
         <StatsCard
           title="Pending Applications"
-          value={stats?.pendingVerifications || pendingFarms.length}
+          value={stats?.pendingVerifications ?? pendingFarms.length}
           icon={ShieldCheck}
           color="purple"
           subtext="Require document review"
@@ -135,7 +145,7 @@ const AdminDashboard = () => {
         ) : (
           <div className="space-y-4">
             {pendingFarms.map((farm) => (
-              <VerificationCard key={farm._id} farm={farm} onActionComplete={fetchData} />
+              <VerificationCard key={farm._id} farm={farm} onActionComplete={handleVerificationAction} />
             ))}
           </div>
         )}
@@ -222,22 +232,22 @@ const demoStats = {
 const demoPendingFarms = [
   {
     _id: 'farm_pending_1',
-    farmName: 'Sunrise Hill Hydroponics',
-    user: { name: 'Robert Vance', email: 'vance@sunrise.com', phone: '+1 555 992 1100' },
-    location: { address: '88 River Road', city: 'Salinas', state: 'CA' },
-    verificationDocs: [{ docType: 'Hydroponics Permit', fileUrl: 'https://images.unsplash.com/photo-1595974482597-4b8da8879bc5?auto=format&fit=crop&w=800&q=80' }]
+    farmName: 'Kongu Valley Organic Hydroponics',
+    user: { name: 'Ramasamy Gounder', email: 'ramasamy@kongufarms.tn', phone: '+91 94421 88990' },
+    location: { address: '88 Pollachi Main Road', city: 'Coimbatore', state: 'Tamil Nadu', zipCode: '641001' },
+    verificationDocs: [{ docType: 'Tamil Nadu Organic Certification (TNOCD)', fileUrl: 'https://images.unsplash.com/photo-1595974482597-4b8da8879bc5?auto=format&fit=crop&w=800&q=80' }]
   }
 ];
 
 const demoCategories = [
-  { _id: 'c1', name: 'Fresh Vegetables', slug: 'vegetables' },
-  { _id: 'c2', name: 'Seasonal Fruits', slug: 'fruits' },
-  { _id: 'c3', name: 'Grains & Pulses', slug: 'grains' }
+  { _id: 'c1', name: 'Fresh Vegetables', slug: 'vegetables', image: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=100&q=80' },
+  { _id: 'c2', name: 'Seasonal Fruits', slug: 'fruits', image: 'https://images.unsplash.com/photo-1610832958506-aa56368176cf?auto=format&fit=crop&w=100&q=80' },
+  { _id: 'c3', name: 'Grains & Pulses', slug: 'grains', image: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=100&q=80' }
 ];
 
 const demoUsers = [
-  { _id: 'u1', name: 'John Harvest', email: 'farmer@greenacres.com', role: 'farmer' },
-  { _id: 'u2', name: 'Sarah Jenkins', email: 'customer@gmail.com', role: 'customer' }
+  { _id: 'u1', name: 'Muthusamy Gounder', email: 'farmer@greenacres.com', role: 'farmer' },
+  { _id: 'u2', name: 'Anand Kumar', email: 'customer@gmail.com', role: 'customer' }
 ];
 
 export default AdminDashboard;

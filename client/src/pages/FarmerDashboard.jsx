@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Tractor, Plus, Sprout, ShoppingBag, Clock, AlertCircle, CheckCircle2, IndianRupee, Edit, Trash2, Phone, MapPin, Package, Check, XCircle, Truck, Camera, Upload } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Tractor, Plus, Sprout, ShoppingBag, Clock, AlertCircle, CheckCircle2, IndianRupee, Edit, Trash2, Phone, MapPin, Package, Check, XCircle, Truck, Camera, Upload, RefreshCw, Video } from 'lucide-react';
 import Badge from '../components/common/Badge';
 import AddProduceModal from '../components/farmer/AddProduceModal';
 import api from '../services/api';
@@ -17,11 +17,78 @@ const FarmerDashboard = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('orders'); // 'orders' | 'inventory' | 'site-photos'
 
-  // Real Farm Site Photo Upload State
+  // Real Camera Capture & Upload State
   const [sitePhotoUrl, setSitePhotoUrl] = useState('');
   const [sitePhotoFile, setSitePhotoFile] = useState(null);
   const [sitePhotoCaption, setSitePhotoCaption] = useState('');
   const [uploadingSitePhoto, setUploadingSitePhoto] = useState(false);
+
+  // HTML5 WebRTC Camera Modal State
+  const [isCameraOpen, setIsCameraOpen] = useState(false);
+  const [cameraStream, setCameraStream] = useState(null);
+  const [facingMode, setFacingMode] = useState('environment'); // 'environment' | 'user'
+  const [capturedImagePreview, setCapturedImagePreview] = useState(null);
+  const videoRef = useRef(null);
+  const canvasRef = useRef(null);
+
+  const startCamera = async (mode = 'environment') => {
+    try {
+      if (cameraStream) {
+        cameraStream.getTracks().forEach(track => track.stop());
+      }
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: mode, width: { ideal: 1280 }, height: { ideal: 720 } }
+      });
+      setCameraStream(stream);
+      setIsCameraOpen(true);
+      setCapturedImagePreview(null);
+      setFacingMode(mode);
+
+      setTimeout(() => {
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+        }
+      }, 100);
+    } catch (err) {
+      console.error('Camera access error:', err);
+      showToast('Camera access denied or unavailable on this device. You can still select an image file directly.', 'error');
+    }
+  };
+
+  const stopCamera = () => {
+    if (cameraStream) {
+      cameraStream.getTracks().forEach(track => track.stop());
+      setCameraStream(null);
+    }
+    setIsCameraOpen(false);
+    setCapturedImagePreview(null);
+  };
+
+  const switchCameraMode = () => {
+    const newMode = facingMode === 'environment' ? 'user' : 'environment';
+    startCamera(newMode);
+  };
+
+  const snapPhoto = () => {
+    if (!videoRef.current || !canvasRef.current) return;
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+    canvas.width = video.videoWidth || 640;
+    canvas.height = video.videoHeight || 480;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+    setCapturedImagePreview(dataUrl);
+
+    canvas.toBlob((blob) => {
+      if (blob) {
+        const file = new File([blob], `live_farm_photo_${Date.now()}.jpg`, { type: 'image/jpeg' });
+        setSitePhotoFile(file);
+        setSitePhotoUrl(dataUrl);
+      }
+    }, 'image/jpeg', 0.85);
+  };
 
   const fetchData = async () => {
     setLoading(true);
@@ -493,30 +560,85 @@ const FarmerDashboard = () => {
       {/* TAB 3: REAL FARM SITE & FIELD PHOTOS */}
       {activeTab === 'site-photos' && (
         <div className="space-y-8">
-          {/* Upload Form Card */}
+          {/* Upload & Camera Trigger Form Card */}
           <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm space-y-6">
             <div className="space-y-1">
               <h3 className="text-lg font-extrabold text-slate-900 flex items-center gap-2">
-                <Camera className="w-5 h-5 text-brand-600" /> Upload Real Current Farm Site Photo
+                <Camera className="w-5 h-5 text-brand-600" /> Real Current Farm Site & Crop Visuals
               </h3>
               <p className="text-xs text-slate-500 font-medium">
-                Share live photos of your crops, fields, and farm operations to build customer trust and showcase produce origin.
+                Share live photos of your crops, field conditions, and harvest operations using your phone or device camera.
               </p>
             </div>
 
+            {/* Direct Camera Button & Upload Modes */}
+            <div className="p-4 bg-brand-50/60 border border-brand-200/80 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-xl bg-brand-600 text-white flex items-center justify-center shadow-md">
+                  <Video className="w-6 h-6" />
+                </div>
+                <div>
+                  <h4 className="text-xs font-black text-slate-900">Live Device Camera Capture</h4>
+                  <p className="text-[11px] text-slate-500 font-medium">Snap photos directly in your browser using rear/front camera</p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => startCamera('environment')}
+                className="w-full sm:w-auto px-5 py-3 bg-brand-600 hover:bg-brand-700 text-white font-extrabold text-xs rounded-xl shadow-md flex items-center justify-center gap-2 transition-all active:scale-95 shrink-0"
+              >
+                <Camera className="w-4 h-4" /> Take Photo with Live Camera
+              </button>
+            </div>
+
+            {/* Photo Preview if Snapped/Selected */}
+            {(sitePhotoUrl || capturedImagePreview) && (
+              <div className="p-4 bg-emerald-50/80 border border-emerald-200 rounded-2xl flex items-center gap-4 animate-in fade-in">
+                <img
+                  src={sitePhotoUrl || capturedImagePreview}
+                  alt="Selected preview"
+                  className="w-20 h-20 object-cover rounded-xl border border-emerald-300 shadow-sm"
+                />
+                <div className="flex-1 space-y-1">
+                  <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded bg-emerald-200 text-emerald-800">
+                    Image Ready to Publish
+                  </span>
+                  <p className="text-xs font-extrabold text-slate-900">Captured / Selected Farm Photo</p>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSitePhotoUrl('');
+                      setSitePhotoFile(null);
+                      setCapturedImagePreview(null);
+                    }}
+                    className="text-[11px] font-extrabold text-rose-600 hover:underline"
+                  >
+                    Remove Photo
+                  </button>
+                </div>
+              </div>
+            )}
+
             <form onSubmit={handleUploadSitePhoto} className="grid grid-cols-1 md:grid-cols-12 gap-4">
               <div className="md:col-span-4 space-y-1">
-                <label className="text-xs font-bold text-slate-700">Photo File Upload:</label>
+                <label className="text-xs font-bold text-slate-700">File Upload / Native Mobile Camera:</label>
                 <input
                   type="file"
                   accept="image/*"
-                  onChange={(e) => setSitePhotoFile(e.target.files[0])}
+                  capture="environment"
+                  onChange={(e) => {
+                    if (e.target.files?.[0]) {
+                      setSitePhotoFile(e.target.files[0]);
+                      setSitePhotoUrl(URL.createObjectURL(e.target.files[0]));
+                    }
+                  }}
                   className="w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-extrabold file:bg-brand-50 file:text-brand-700 hover:file:bg-brand-100 border border-slate-200 rounded-xl p-1"
                 />
               </div>
 
               <div className="md:col-span-4 space-y-1">
-                <label className="text-xs font-bold text-slate-700">Or Image URL:</label>
+                <label className="text-xs font-bold text-slate-700">Or Image Web URL:</label>
                 <input
                   type="url"
                   placeholder="https://..."
@@ -527,7 +649,7 @@ const FarmerDashboard = () => {
               </div>
 
               <div className="md:col-span-4 space-y-1">
-                <label className="text-xs font-bold text-slate-700">Caption / Location Detail:</label>
+                <label className="text-xs font-bold text-slate-700">Caption / Crop Field Details:</label>
                 <input
                   type="text"
                   placeholder="e.g., Organic Chinna Vengayam Drying Yard"
@@ -543,7 +665,7 @@ const FarmerDashboard = () => {
                   disabled={uploadingSitePhoto}
                   className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs px-6 py-3 rounded-xl shadow-md transition-all active:scale-95 disabled:bg-slate-300"
                 >
-                  <Upload className="w-4 h-4" /> {uploadingSitePhoto ? 'Uploading...' : 'Publish Farm Site Photo'}
+                  <Upload className="w-4 h-4" /> {uploadingSitePhoto ? 'Publishing...' : 'Publish Farm Site Photo'}
                 </button>
               </div>
             </form>
@@ -595,62 +717,123 @@ const FarmerDashboard = () => {
         </div>
       )}
 
+      {/* HTML5 WebRTC Live Device Camera Viewfinder Modal */}
+      {isCameraOpen && (
+        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-xl w-full p-6 shadow-2xl space-y-4 border border-slate-200 animate-in zoom-in-95">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Video className="w-5 h-5 text-emerald-600 animate-pulse" />
+                <h3 className="text-base font-extrabold text-slate-900">Live Device Camera Viewfinder</h3>
+              </div>
+              <button
+                type="button"
+                onClick={stopCamera}
+                className="p-2 rounded-full text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition-all"
+              >
+                <XCircle className="w-6 h-6" />
+              </button>
+            </div>
+
+            <div className="relative rounded-2xl overflow-hidden bg-black aspect-video flex items-center justify-center border border-slate-800">
+              {capturedImagePreview ? (
+                <img src={capturedImagePreview} alt="Captured preview" className="w-full h-full object-cover" />
+              ) : (
+                <video
+                  ref={videoRef}
+                  autoPlay
+                  playsInline
+                  className="w-full h-full object-cover"
+                />
+              )}
+              <canvas ref={canvasRef} className="hidden" />
+            </div>
+
+            {/* Camera Controls */}
+            <div className="flex items-center justify-between pt-2">
+              <button
+                type="button"
+                onClick={switchCameraMode}
+                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-extrabold text-xs rounded-xl flex items-center gap-1.5 transition-all"
+              >
+                <RefreshCw className="w-4 h-4" /> Flip Camera ({facingMode === 'environment' ? 'Rear' : 'Front'})
+              </button>
+
+              {capturedImagePreview ? (
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setCapturedImagePreview(null)}
+                    className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-extrabold text-xs rounded-xl transition-all"
+                  >
+                    Retake Photo
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      showToast('Photo captured successfully! Click Publish to upload. 📸', 'success');
+                      stopCamera();
+                    }}
+                    className="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs rounded-xl shadow-md flex items-center gap-1.5 transition-all"
+                  >
+                    <Check className="w-4 h-4" /> Use Captured Photo
+                  </button>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={snapPhoto}
+                  className="px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white font-extrabold text-xs rounded-2xl shadow-lg flex items-center gap-2 transition-all active:scale-95"
+                >
+                  <Camera className="w-5 h-5" /> Snap Photo
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Add Produce Modal */}
       <AddProduceModal
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
-        onRefresh={fetchData}
+        onSuccess={fetchData}
         categories={categories}
       />
-
     </div>
   );
 };
 
-const demoFarmProfile = {
-  _id: 'f1',
-  farmName: 'Green Acres Organic Valley',
-  verificationStatus: 'approved'
-};
-
 const demoFarmerProducts = [
-  { _id: 'p1', title: 'Farm Fresh Red Tomatoes (Tamatar)', pricePerUnit: 20.00, unit: 'kg', stockQuantity: 150, harvestDate: new Date(), isOrganic: true, images: ['https://images.unsplash.com/photo-1592924357228-91a4daadcfea?auto=format&fit=crop&w=100&q=80'] },
-  { _id: 'p2', title: 'Sweet Alphonso Mangoes (Aam)', pricePerUnit: 65.00, unit: 'kg', stockQuantity: 80, harvestDate: new Date(), isOrganic: true, images: ['https://images.unsplash.com/photo-1553279768-865429fa0078?auto=format&fit=crop&w=100&q=80'] }
-];
-
-const demoFarmerOrders = [
   {
-    _id: 'ord1',
-    orderNumber: 'FBM-882910',
-    customer: { name: 'Priya Sharma' },
-    totalAmount: 170.00,
-    orderStatus: 'pending',
-    paymentInfo: { method: 'upi', status: 'paid' },
-    createdAt: new Date(),
-    deliveryAddress: { street: 'MG Road, Flat 402', city: 'Mumbai', state: 'MH', zipCode: '400001', phone: '+91 98765 43210' },
-    items: [
-      { title: 'Farm Fresh Red Tomatoes (Tamatar)', quantity: 2, pricePerUnit: 20, totalPrice: 40 },
-      { title: 'Sweet Alphonso Mangoes (Aam)', quantity: 2, pricePerUnit: 65, totalPrice: 130 }
-    ]
-  },
-  {
-    _id: 'ord2',
-    orderNumber: 'FBM-759201',
-    customer: { name: 'Amit Patel' },
-    totalAmount: 60.00,
-    orderStatus: 'harvested_packed',
-    paymentInfo: { method: 'cod', status: 'pending' },
-    createdAt: new Date(Date.now() - 3600000),
-    deliveryAddress: { street: '12 Park Street, Flat 9', city: 'Pune', state: 'MH', zipCode: '411001', phone: '+91 98765 11223' },
-    items: [
-      { title: 'Free-Range Country Hen Eggs (Ande)', quantity: 1, pricePerUnit: 60, totalPrice: 60 }
-    ]
+    _id: 'prod_1',
+    title: 'Madurai Country Organic Tomatoes (மதுரை தக்காளி)',
+    pricePerUnit: 22.00,
+    unit: 'kg',
+    stockQuantity: 180,
+    harvestDate: new Date(),
+    isOrganic: true,
+    images: ['https://images.unsplash.com/photo-1592924357228-91a4daadcfea?auto=format&fit=crop&w=800&q=80'],
+    status: 'available'
   }
 ];
 
+const demoFarmProfile = {
+  _id: 'farm_1',
+  farmName: 'Kongu Organic Agriculture Farm',
+  story: '35-acre pesticide-free family farm located in Coimbatore/Pollachi belt, Tamil Nadu.',
+  verificationStatus: 'approved',
+  ratingAverage: 4.9,
+  ratingCount: 42,
+  siteImages: [
+    { _id: 'img_1', url: 'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?auto=format&fit=crop&w=800&q=80', caption: 'Kongu Organic Vegetable Patch & Irrigation Canal', dateUploaded: new Date() },
+    { _id: 'img_2', url: 'https://images.unsplash.com/photo-1592417817098-8f3d6eb19655?auto=format&fit=crop&w=800&q=80', caption: 'Fresh Country Tomato Plants in Harvest Season', dateUploaded: new Date() }
+  ]
+};
+
 const demoCategories = [
-  { _id: 'c1', name: 'Fresh Vegetables' },
-  { _id: 'c2', name: 'Seasonal Fruits' }
+  { _id: 'c1', name: 'Fresh Vegetables', slug: 'vegetables' },
+  { _id: 'c2', name: 'Seasonal Fruits', slug: 'fruits' }
 ];
 
 export default FarmerDashboard;
