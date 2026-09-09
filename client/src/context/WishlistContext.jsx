@@ -23,7 +23,9 @@ export const WishlistProvider = ({ children }) => {
         setWishlist(res.data.data.wishlist || []);
       }
     } catch (err) {
-      console.warn('Failed to fetch wishlist:', err);
+      if (err.response?.status === 401) {
+        setWishlist([]);
+      }
     } finally {
       setLoading(false);
     }

@@ -8,6 +8,20 @@ export const FALLBACK_IMAGES = {
 };
 
 /**
+ * Resolves image URL to handle relative uploaded files, base64 data, and remote URLs
+ * @param {string} url 
+ * @param {'produce' | 'farm' | 'avatar'} type 
+ * @returns {string}
+ */
+export const getImageUrl = (url, type = 'produce') => {
+  if (!url) return FALLBACK_IMAGES[type] || FALLBACK_IMAGES.produce;
+  if (url.startsWith('/uploads')) {
+    return url;
+  }
+  return url;
+};
+
+/**
  * Image onError handler to prevent broken image icons on UI
  * @param {Event} e 
  * @param {'produce' | 'farm' | 'avatar'} type 

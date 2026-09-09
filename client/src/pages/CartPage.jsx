@@ -2,6 +2,7 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ShoppingBag, Trash2, Plus, Minus, ArrowRight, ArrowLeft } from 'lucide-react';
 import { useCart } from '../context/CartContext';
+import { handleImageError, getImageUrl } from '../utils/imageUtils';
 
 const CartPage = () => {
   const { cart, updateQuantity, removeFromCart, clearCart, cartTotal } = useCart();
@@ -59,8 +60,9 @@ const CartPage = () => {
                 <div key={item._id} className="py-4 flex items-center justify-between gap-4">
                   <div className="flex items-center gap-4">
                     <img
-                      src={item.images?.[0] || 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=150&q=80'}
+                      src={getImageUrl(item.images?.[0], 'produce')}
                       alt={item.title}
+                      onError={(e) => handleImageError(e, 'produce')}
                       className="w-16 h-16 object-cover rounded-2xl border"
                     />
                     <div>

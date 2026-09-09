@@ -33,7 +33,6 @@ const Shop = () => {
         if (prodRes.data.success) setProducts(prodRes.data.data.products);
         if (catRes.data.success) setCategories(catRes.data.data.categories);
       } catch (err) {
-        console.warn('Using demo dataset for shop');
         setProducts(demoShopProducts);
       } finally {
         setLoading(false);

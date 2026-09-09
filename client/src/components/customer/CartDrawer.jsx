@@ -2,7 +2,7 @@ import React from 'react';
 import { X, Trash2, Plus, Minus, ShoppingBag, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
-import { handleImageError } from '../../utils/imageUtils';
+import { handleImageError, getImageUrl } from '../../utils/imageUtils';
 
 const CartDrawer = () => {
   const { cart, isDrawerOpen, setIsDrawerOpen, updateQuantity, removeFromCart, cartTotal } = useCart();
@@ -60,7 +60,7 @@ const CartDrawer = () => {
                 >
                   <div className="flex items-center gap-3">
                     <img
-                      src={item.images?.[0] || 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=150&q=80'}
+                      src={getImageUrl(item.images?.[0], 'produce')}
                       alt={item.title}
                       onError={(e) => handleImageError(e, 'produce')}
                       className="w-14 h-14 object-cover rounded-xl border border-slate-200"

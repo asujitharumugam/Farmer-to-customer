@@ -6,6 +6,7 @@ import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { useWishlist } from '../context/WishlistContext';
 import api from '../services/api';
+import { handleImageError, getImageUrl } from '../utils/imageUtils';
 
 const ProduceDetails = () => {
   const { id } = useParams();
@@ -95,8 +96,9 @@ const ProduceDetails = () => {
         <div className="lg:col-span-6 space-y-4">
           <div className="relative aspect-[4/3] rounded-3xl overflow-hidden bg-slate-100 border border-slate-200">
             <img
-              src={product.images?.[0] || 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=800&q=80'}
+              src={getImageUrl(product.images?.[0], 'produce')}
               alt={product.title}
+              onError={(e) => handleImageError(e, 'produce')}
               className="w-full h-full object-cover"
             />
             <div className="absolute top-4 left-4 flex flex-wrap gap-2 z-10">

@@ -4,7 +4,7 @@ import { Calendar, ShoppingBag, MapPin, Heart } from 'lucide-react';
 import Badge from '../common/Badge';
 import { useCart } from '../../context/CartContext';
 import { useWishlist } from '../../context/WishlistContext';
-import { handleImageError } from '../../utils/imageUtils';
+import { handleImageError, getImageUrl } from '../../utils/imageUtils';
 
 const ProduceCard = ({ product }) => {
   const { addToCart } = useCart();
@@ -12,12 +12,12 @@ const ProduceCard = ({ product }) => {
 
   const isSaved = isInWishlist(product?._id);
 
-  const harvestFormatted = product.harvestDate
+  const harvestFormatted = product?.harvestDate && !isNaN(new Date(product.harvestDate).getTime())
     ? new Date(product.harvestDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
     : 'Harvest Ready';
 
-  const defaultImg = 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=600&q=80';
-  const displayImg = product.images && product.images.length > 0 ? product.images[0] : defaultImg;
+  const rawImg = product.images && product.images.length > 0 ? product.images[0] : null;
+  const displayImg = getImageUrl(rawImg, 'produce');
 
   return (
     <div className="group bg-white rounded-3xl overflow-hidden border border-slate-200/80 shadow-sm hover:shadow-2xl hover:border-brand-300 hover:-translate-y-1.5 transition-all duration-300 flex flex-col h-full relative">

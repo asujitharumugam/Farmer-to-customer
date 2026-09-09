@@ -65,14 +65,25 @@ exports.getAdminReports = catchAsync(async (req, res, next) => {
 
 // 3. Manage Farmers & Verification
 exports.getAllFarmers = catchAsync(async (req, res, next) => {
-  const farms = await FarmProfile.find()
-    .populate('user', 'name email phone avatar status createdAt')
-    .sort({ createdAt: -1 });
+  const farmerUsers = await User.find({ role: 'farmer' }).select('-password').sort({ createdAt: -1 });
+  const farmProfiles = await FarmProfile.find();
+
+  const farmers = farmerUsers.map(user => {
+    const farm = farmProfiles.find(f => f.user.toString() === user._id.toString());
+    return {
+      _id: farm ? farm._id : user._id,
+      user,
+      farmName: farm ? farm.farmName : 'Farm Profile Pending Setup',
+      verificationStatus: farm ? farm.verificationStatus : 'pending',
+      location: farm ? farm.location : null,
+      createdAt: user.createdAt
+    };
+  });
 
   res.status(200).json({
     success: true,
-    results: farms.length,
-    data: { farms }
+    results: farmers.length,
+    data: { farmers }
   });
 });
 

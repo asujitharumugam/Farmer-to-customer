@@ -21,8 +21,11 @@ export const AuthProvider = ({ children }) => {
             localStorage.setItem('farm_user', JSON.stringify(res.data.data.user));
           }
         } catch (err) {
-          console.warn('Session verification failed:', err.message);
-          // If server is offline, keep cached demo user or reset
+          if (err.response?.status === 401 || err.response?.status === 403) {
+            localStorage.removeItem('farm_token');
+            localStorage.removeItem('farm_user');
+            setUser(null);
+          }
         }
       }
       setLoading(false);
