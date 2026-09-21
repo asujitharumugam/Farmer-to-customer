@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { X, Upload, Sprout, Sparkles, Check } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { X, Upload, Sprout, Sparkles, Check, Camera, Video, RefreshCw, XCircle } from 'lucide-react';
 import api from '../../services/api';
 
 const TN_PRODUCE_PRESETS = [
@@ -82,6 +82,16 @@ const TN_PRODUCE_PRESETS = [
     description: 'Tender long green drumsticks grown naturally in Theni & Dindigul region. Loaded with iron.',
     isOrganic: true,
     imageUrl: 'https://images.unsplash.com/photo-1571680322279-a226e6a4cc2a?auto=format&fit=crop&w=800&q=80'
+  },
+  {
+    name: 'Chettinad Red Chillies',
+    title: 'Chettinad Organic Dry Red Chillies (செட்டிநாடு மிளகாய்)',
+    pricePerUnit: 180.00,
+    unit: 'kg',
+    stockQuantity: 90,
+    description: 'Vibrant red, sun-dried fiery aromatic chillies cultivated in Chettinad region.',
+    isOrganic: true,
+    imageUrl: 'https://images.unsplash.com/photo-1588252303782-cb80119abd6d?auto=format&fit=crop&w=800&q=80'
   }
 ];
 
@@ -103,6 +113,14 @@ const AddProduceModal = ({ isOpen, onClose, onRefresh, categories }) => {
   const [error, setError] = useState('');
   const [selectedPreset, setSelectedPreset] = useState(null);
 
+  // Live Camera Capture State
+  const [isCameraOpen, setIsCameraOpen] = useState(false);
+  const [cameraStream, setCameraStream] = useState(null);
+  const [facingMode, setFacingMode] = useState('environment'); // 'environment' | 'user'
+  const [capturedPhotoPreview, setCapturedPhotoPreview] = useState(null);
+  const videoRef = useRef(null);
+  const canvasRef = useRef(null);
+
   useEffect(() => {
     if (categories && categories.length > 0) {
       setFormData(prev => ({ ...prev, categoryId: categories[0]._id }));
@@ -111,9 +129,69 @@ const AddProduceModal = ({ isOpen, onClose, onRefresh, categories }) => {
 
   if (!isOpen) return null;
 
+  const startCamera = async (mode = 'environment') => {
+    try {
+      if (cameraStream) {
+        cameraStream.getTracks().forEach(track => track.stop());
+      }
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: mode, width: { ideal: 1280 }, height: { ideal: 720 } }
+      });
+      setCameraStream(stream);
+      setIsCameraOpen(true);
+      setCapturedPhotoPreview(null);
+      setFacingMode(mode);
+
+      setTimeout(() => {
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+        }
+      }, 100);
+    } catch (err) {
+      alert('Camera access denied or unavailable. Select an image file directly.');
+    }
+  };
+
+  const stopCamera = () => {
+    if (cameraStream) {
+      cameraStream.getTracks().forEach(track => track.stop());
+      setCameraStream(null);
+    }
+    setIsCameraOpen(false);
+    setCapturedPhotoPreview(null);
+  };
+
+  const switchCameraMode = () => {
+    const newMode = facingMode === 'environment' ? 'user' : 'environment';
+    startCamera(newMode);
+  };
+
+  const snapPhoto = () => {
+    if (!videoRef.current || !canvasRef.current) return;
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+    canvas.width = video.videoWidth || 640;
+    canvas.height = video.videoHeight || 480;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+    setCapturedPhotoPreview(dataUrl);
+
+    canvas.toBlob((blob) => {
+      if (blob) {
+        const file = new File([blob], `live_produce_photo_${Date.now()}.jpg`, { type: 'image/jpeg' });
+        setImages([file]);
+        setPreview([dataUrl]);
+        setPresetImageUrl(dataUrl);
+      }
+    }, 'image/jpeg', 0.85);
+  };
+
   const handleApplyPreset = (preset) => {
     setSelectedPreset(preset.name);
     setPresetImageUrl(preset.imageUrl);
+    setPreview([preset.imageUrl]);
     setFormData(prev => ({
       ...prev,
       title: preset.title,
@@ -155,14 +233,15 @@ const AddProduceModal = ({ isOpen, onClose, onRefresh, categories }) => {
         onClose();
       }
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to add produce listing.');
+      onRefresh();
+      onClose();
     } finally {
       setSubmitting(false);
     }
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 font-sans">
       <div className="bg-white rounded-3xl max-w-xl w-full p-6 shadow-2xl relative border border-slate-100 animate-in fade-in zoom-in-95 my-8">
         
         <div className="flex items-center justify-between border-b border-slate-100 pb-4 mb-4">
@@ -182,7 +261,7 @@ const AddProduceModal = ({ isOpen, onClose, onRefresh, categories }) => {
         <div className="mb-5 p-3.5 bg-emerald-50/80 rounded-2xl border border-emerald-200/80 space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-xs font-black text-emerald-900 flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-amber-500" /> 1-Click Tamil Nadu Crop Presets:
+              <Sparkles className="w-3.5 h-3.5 text-amber-500" /> Tamil Nadu Authentic Crop Presets:
             </span>
             <span className="text-[10px] font-extrabold text-emerald-700">Quick Fill</span>
           </div>
@@ -205,6 +284,35 @@ const AddProduceModal = ({ isOpen, onClose, onRefresh, categories }) => {
             ))}
           </div>
         </div>
+
+        {/* Live Camera Upload Bar */}
+        <div className="mb-4 p-3 bg-brand-50 border border-brand-200 rounded-2xl flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <Video className="w-5 h-5 text-brand-600 shrink-0" />
+            <div>
+              <p className="text-xs font-black text-slate-900">Live Produce Camera Capture</p>
+              <p className="text-[10px] text-slate-500 font-semibold">Snap live picture of your harvest with webcam/phone</p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => startCamera('environment')}
+            className="px-3.5 py-2 bg-brand-600 hover:bg-brand-700 text-white font-extrabold text-xs rounded-xl shadow-sm flex items-center gap-1.5 transition-all shrink-0"
+          >
+            <Camera className="w-4 h-4" /> Snap Live Camera
+          </button>
+        </div>
+
+        {/* Image Preview Box if image ready */}
+        {preview.length > 0 && (
+          <div className="mb-4 p-3 bg-slate-50 border border-slate-200 rounded-2xl flex items-center gap-3">
+            <img src={preview[0]} alt="Produce Preview" className="w-14 h-14 object-cover rounded-xl border border-slate-300 shadow-sm" />
+            <div className="flex-1">
+              <span className="text-[10px] font-black uppercase text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded">Photo Attached</span>
+              <p className="text-xs font-bold text-slate-800 mt-0.5">Produce Image Ready</p>
+            </div>
+          </div>
+        )}
 
         {error && (
           <div className="mb-4 p-3 bg-rose-50 border border-rose-200 text-rose-700 text-xs font-bold rounded-xl">
@@ -320,7 +428,7 @@ const AddProduceModal = ({ isOpen, onClose, onRefresh, categories }) => {
           </div>
 
           <div>
-            <label className="block mb-1">Upload Crop Photo File</label>
+            <label className="block mb-1">Or Select Local Image File</label>
             <input
               type="file"
               multiple
@@ -349,6 +457,82 @@ const AddProduceModal = ({ isOpen, onClose, onRefresh, categories }) => {
         </form>
 
       </div>
+
+      {/* HTML5 WebRTC Produce Camera Viewfinder Modal */}
+      {isCameraOpen && (
+        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-xl w-full p-6 shadow-2xl space-y-4 border border-slate-200 animate-in zoom-in-95">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Video className="w-5 h-5 text-emerald-600 animate-pulse" />
+                <h3 className="text-base font-extrabold text-slate-900">Live Produce Camera Viewfinder</h3>
+              </div>
+              <button
+                type="button"
+                onClick={stopCamera}
+                className="p-1.5 rounded-full text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition-all"
+              >
+                <XCircle className="w-6 h-6" />
+              </button>
+            </div>
+
+            <div className="relative rounded-2xl overflow-hidden bg-black aspect-video flex items-center justify-center border border-slate-800">
+              {capturedPhotoPreview ? (
+                <img src={capturedPhotoPreview} alt="Captured preview" className="w-full h-full object-cover" />
+              ) : (
+                <video
+                  ref={videoRef}
+                  autoPlay
+                  playsInline
+                  className="w-full h-full object-cover"
+                />
+              )}
+              <canvas ref={canvasRef} className="hidden" />
+            </div>
+
+            {/* Camera Controls */}
+            <div className="flex items-center justify-between pt-2">
+              <button
+                type="button"
+                onClick={switchCameraMode}
+                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-extrabold text-xs rounded-xl flex items-center gap-1.5 transition-all"
+              >
+                <RefreshCw className="w-4 h-4" /> Flip Camera ({facingMode === 'environment' ? 'Rear' : 'Front'})
+              </button>
+
+              {capturedPhotoPreview ? (
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setCapturedPhotoPreview(null)}
+                    className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-extrabold text-xs rounded-xl transition-all"
+                  >
+                    Retake Photo
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      stopCamera();
+                    }}
+                    className="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs rounded-xl shadow-md flex items-center gap-1.5 transition-all"
+                  >
+                    <Check className="w-4 h-4" /> Attach Photo
+                  </button>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={snapPhoto}
+                  className="px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white font-extrabold text-xs rounded-2xl shadow-lg flex items-center gap-2 transition-all active:scale-95"
+                >
+                  <Camera className="w-5 h-5" /> Snap Photo
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };

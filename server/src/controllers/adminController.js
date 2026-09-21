@@ -160,6 +160,27 @@ exports.toggleUserStatus = catchAsync(async (req, res, next) => {
   });
 });
 
+exports.approveUserAccount = catchAsync(async (req, res, next) => {
+  const { approvalStatus } = req.body;
+  if (!['approved', 'rejected', 'pending'].includes(approvalStatus)) {
+    return next(new AppError('Approval status must be approved, rejected or pending', 400));
+  }
+
+  const user = await User.findById(req.params.userId);
+  if (!user) {
+    return next(new AppError('User not found', 404));
+  }
+
+  user.approvalStatus = approvalStatus;
+  await user.save();
+
+  res.status(200).json({
+    success: true,
+    message: `User registration approval status updated to ${approvalStatus}`,
+    data: { user }
+  });
+});
+
 // 6. Manage Products
 exports.getAllProductsAdmin = catchAsync(async (req, res, next) => {
   const products = await Product.find()

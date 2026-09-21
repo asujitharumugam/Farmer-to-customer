@@ -23,6 +23,7 @@ router.patch('/farmers/:id/verify', adminController.verifyFarmer);
 router.get('/customers', adminController.getAllCustomers);
 router.get('/users', adminController.getAllUsers);
 router.patch('/users/:userId/status', adminController.toggleUserStatus);
+router.patch('/users/:userId/approve', adminController.approveUserAccount);
 
 // 4. Manage Products Moderation
 router.get('/products', adminController.getAllProductsAdmin);

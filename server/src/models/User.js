@@ -50,6 +50,15 @@ const userSchema = new mongoose.Schema({
     enum: ['active', 'suspended'],
     default: 'active'
   },
+  approvalStatus: {
+    type: String,
+    enum: ['pending', 'approved', 'rejected'],
+    default: 'approved'
+  },
+  otpCode: String,
+  otpExpires: Date,
+  isPhoneVerified: { type: Boolean, default: false },
+  isEmailVerified: { type: Boolean, default: false },
   passwordResetToken: String,
   passwordResetExpires: Date
 }, { timestamps: true });

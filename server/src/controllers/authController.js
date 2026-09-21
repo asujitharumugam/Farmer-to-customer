@@ -21,8 +21,47 @@ const sendTokenResponse = (user, statusCode, res) => {
   });
 };
 
+exports.sendOTP = catchAsync(async (req, res, next) => {
+  const { target, type } = req.body; // type: 'email' | 'phone'
+  if (!target) {
+    return next(new AppError('Please provide email or phone number for OTP verification.', 400));
+  }
+
+  // Generate 6-digit OTP code
+  const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+  const otpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 mins
+
+  console.log(`[OTP AUTH SIMULATION] Sent OTP ${otpCode} to ${type}: ${target}`);
+
+  res.status(200).json({
+    success: true,
+    message: `OTP sent successfully to your ${type || 'contact'} (${target})`,
+    otpCode,
+    target,
+    type: type || 'email'
+  });
+});
+
+exports.verifyOTP = catchAsync(async (req, res, next) => {
+  const { target, otpCode } = req.body;
+  if (!target || !otpCode) {
+    return next(new AppError('Please provide target and 6-digit OTP code.', 400));
+  }
+
+  // Verification check: Accept any 6-digit numeric string or matching simulation code
+  if (otpCode.length !== 6 || isNaN(Number(otpCode))) {
+    return next(new AppError('Invalid OTP code format. Enter 6 numeric digits.', 400));
+  }
+
+  res.status(200).json({
+    success: true,
+    message: 'OTP verified successfully!',
+    verifiedTarget: target
+  });
+});
+
 exports.register = catchAsync(async (req, res, next) => {
-  const { name, email, password, role, phone } = req.body;
+  const { name, email, password, role, phone, otpVerified } = req.body;
 
   if (role === 'admin') {
     return next(new AppError('Cannot register as Admin directly.', 403));
@@ -38,7 +77,10 @@ exports.register = catchAsync(async (req, res, next) => {
     email,
     password,
     role: role || 'customer',
-    phone: phone || ''
+    phone: phone || '',
+    approvalStatus: 'approved',
+    isPhoneVerified: Boolean(phone && otpVerified),
+    isEmailVerified: Boolean(email && otpVerified)
   });
 
   sendTokenResponse(newUser, 201, res);

@@ -4,8 +4,13 @@ const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
   const [cart, setCart] = useState(() => {
-    const saved = localStorage.getItem('farm_cart');
-    return saved ? JSON.parse(saved) : [];
+    try {
+      const saved = localStorage.getItem('farm_cart');
+      return saved ? JSON.parse(saved) : [];
+    } catch (err) {
+      localStorage.removeItem('farm_cart');
+      return [];
+    }
   });
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 

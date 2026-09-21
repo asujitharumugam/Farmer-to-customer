@@ -48,3 +48,16 @@ exports.getProductReviews = catchAsync(async (req, res, next) => {
     data: { reviews }
   });
 });
+
+exports.getAllReviews = catchAsync(async (req, res, next) => {
+  const reviews = await Review.find()
+    .populate('customer', 'name email avatar')
+    .populate('product', 'title images')
+    .sort({ createdAt: -1 });
+
+  res.status(200).json({
+    success: true,
+    results: reviews.length,
+    data: { reviews }
+  });
+});

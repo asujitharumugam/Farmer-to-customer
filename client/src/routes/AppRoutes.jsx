@@ -82,6 +82,7 @@ const AppRoutes = () => {
     <Routes>
       {/* Root Route: Requires Login First */}
       <Route path="/" element={<RootRoute />} />
+      <Route path="/landing" element={<LandingPage />} />
 
       {/* Auth Pages (accessible only when not logged in) */}
       <Route

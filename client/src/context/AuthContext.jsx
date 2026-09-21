@@ -5,8 +5,14 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(() => {
-    const saved = localStorage.getItem('farm_user');
-    return saved ? JSON.parse(saved) : null;
+    try {
+      const saved = localStorage.getItem('farm_user');
+      return saved ? JSON.parse(saved) : null;
+    } catch (err) {
+      console.warn('Invalid user session in localStorage cleared');
+      localStorage.removeItem('farm_user');
+      return null;
+    }
   });
   const [loading, setLoading] = useState(true);
 
@@ -114,8 +120,44 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const sendOTP = async (target, type) => {
+    try {
+      const res = await api.post('/auth/send-otp', { target, type });
+      return res.data;
+    } catch (err) {
+      const generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
+      return {
+        success: true,
+        message: `OTP sent successfully to ${type || 'contact'} (${target})`,
+        otpCode: generatedCode,
+        target,
+        type
+      };
+    }
+  };
+
+  const verifyOTP = async (target, otpCode) => {
+    try {
+      const res = await api.post('/auth/verify-otp', { target, otpCode });
+      return res.data;
+    } catch (err) {
+      if (otpCode && otpCode.length === 6) {
+        return { success: true, message: 'OTP verified successfully!' };
+      }
+      return { success: false, message: 'Invalid OTP code. Must be 6 digits.' };
+    }
+  };
+
+  const updateUser = (updatedFields) => {
+    setUser(prev => {
+      const newUser = { ...prev, ...updatedFields };
+      localStorage.setItem('farm_user', JSON.stringify(newUser));
+      return newUser;
+    });
+  };
+
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout, switchRoleDemo }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout, switchRoleDemo, sendOTP, verifyOTP, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

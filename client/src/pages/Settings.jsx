@@ -33,6 +33,28 @@ const Settings = () => {
         </div>
       )}
 
+      {/* Profile & Avatar Quick Box */}
+      <div className="bg-gradient-to-r from-brand-600 to-emerald-700 text-white p-6 rounded-3xl shadow-md flex items-center justify-between gap-4">
+        <div className="flex items-center gap-4">
+          <img
+            src={user?.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80'}
+            alt={user?.name || 'User'}
+            className="w-14 h-14 rounded-2xl object-cover border-2 border-white shadow"
+          />
+          <div>
+            <h3 className="text-base font-extrabold">{user?.name || 'Registered Account'}</h3>
+            <p className="text-xs text-brand-100 font-semibold">{user?.email || 'user@example.com'} | {user?.role?.toUpperCase() || 'CUSTOMER'}</p>
+          </div>
+        </div>
+
+        <a
+          href="/customer/profile"
+          className="px-4 py-2.5 bg-white text-brand-800 font-black text-xs rounded-xl shadow hover:bg-slate-100 transition-all shrink-0"
+        >
+          📷 Edit Profile & Avatar
+        </a>
+      </div>
+
       <form onSubmit={handleSaveSettings} className="space-y-6">
         
         {/* Notification Settings */}
